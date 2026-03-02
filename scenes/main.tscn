@@ -1,0 +1,112 @@
+[gd_scene load_steps=3 format=3 uid="uid://bt30r1vr30vle"]
+
+[ext_resource type="Script" uid="uid://6rfynpaylohb" path="res://scripts/main.gd" id="1_main"]
+[ext_resource type="Texture2D" uid="uid://btbgsav8b0tda" path="res://assets/images/backgrounds/market.png" id="2_0wfyh"]
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_main")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_0wfyh")
+expand_mode = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 8
+
+[node name="StatusBar" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="MoneyLabel" type="Label" parent="VBoxContainer/StatusBar"]
+layout_mode = 2
+text = "铜钱: 0"
+
+[node name="DayLabel" type="Label" parent="VBoxContainer/StatusBar"]
+layout_mode = 2
+text = "第 1 天"
+
+[node name="Spacer" type="Control" parent="VBoxContainer/StatusBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "今日可接委托："
+
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="NPCList" type="VBoxContainer" parent="VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 4
+
+[node name="ButtonBar" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="StartDayBtn" type="Button" parent="VBoxContainer/ButtonBar"]
+layout_mode = 2
+text = "开始今日"
+
+[node name="EndDayBtn" type="Button" parent="VBoxContainer/ButtonBar"]
+layout_mode = 2
+text = "结束今日"
+
+[node name="SaveQuitBtn" type="Button" parent="VBoxContainer/ButtonBar"]
+layout_mode = 2
+text = "保存并退出"
+
+[node name="DaySettlementDialog" type="ConfirmationDialog" parent="."]
+title = "今日结算"
+size = Vector2i(640, 420)
+
+[node name="DialogContent" type="VBoxContainer" parent="DaySettlementDialog"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 12.0
+offset_right = -12.0
+offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 8
+
+[node name="SummaryLabel" type="Label" parent="DaySettlementDialog/DialogContent"]
+layout_mode = 2
+text = "（今日结算摘要）"
+autowrap_mode = 3
+
+[node name="DetailsScroll" type="ScrollContainer" parent="DaySettlementDialog/DialogContent"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="DetailsLabel" type="RichTextLabel" parent="DaySettlementDialog/DialogContent/DetailsScroll"]
+layout_mode = 2
+bbcode_enabled = true
+fit_content = true

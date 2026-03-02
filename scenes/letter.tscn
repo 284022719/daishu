@@ -1,0 +1,204 @@
+[gd_scene load_steps=3 format=3 uid="uid://cqwwsqyirihef"]
+
+[ext_resource type="Script" uid="uid://co32gx0hwqxwf" path="res://scripts/letter.gd" id="1_letter"]
+[ext_resource type="Texture2D" uid="uid://b43wo1f6igftl" path="res://assets/images/backgrounds/letter.png" id="2_s3w0n"]
+
+[node name="Letter" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_letter")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_s3w0n")
+expand_mode = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="NPCAvatar" type="TextureRect" parent="VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+stretch_mode = 5
+
+[node name="RequestLabel" type="Label" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "（口述内容）"
+autowrap_mode = 3
+
+[node name="LetterPaper" type="Panel" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="LetterContent" type="VBoxContainer" parent="VBoxContainer/LetterPaper"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 8
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/LetterPaper/LetterContent"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Label" type="Label" parent="VBoxContainer/LetterPaper/LetterContent/HBoxContainer"]
+layout_mode = 2
+text = "称谓："
+
+[node name="SalutationOption" type="OptionButton" parent="VBoxContainer/LetterPaper/LetterContent/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer/LetterPaper/LetterContent"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Label" type="Label" parent="VBoxContainer/LetterPaper/LetterContent/HBoxContainer2"]
+layout_mode = 2
+text = "正文："
+
+[node name="BodyContainer" type="VBoxContainer" parent="VBoxContainer/LetterPaper/LetterContent/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/LetterPaper/LetterContent/HBoxContainer2/BodyContainer"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Label" type="Label" parent="VBoxContainer/LetterPaper/LetterContent/HBoxContainer2/BodyContainer/HBoxContainer"]
+layout_mode = 2
+text = "家中"
+
+[node name="BodySlot1" type="Button" parent="VBoxContainer/LetterPaper/LetterContent/HBoxContainer2/BodyContainer/HBoxContainer"]
+layout_mode = 2
+text = "（填空1）"
+
+[node name="Label2" type="Label" parent="VBoxContainer/LetterPaper/LetterContent/HBoxContainer2/BodyContainer/HBoxContainer"]
+layout_mode = 2
+text = "。"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer/LetterPaper/LetterContent/HBoxContainer2/BodyContainer"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Label" type="Label" parent="VBoxContainer/LetterPaper/LetterContent/HBoxContainer2/BodyContainer/HBoxContainer2"]
+layout_mode = 2
+text = "在外"
+
+[node name="BodySlot2" type="Button" parent="VBoxContainer/LetterPaper/LetterContent/HBoxContainer2/BodyContainer/HBoxContainer2"]
+layout_mode = 2
+text = "（填空2）"
+
+[node name="Label2" type="Label" parent="VBoxContainer/LetterPaper/LetterContent/HBoxContainer2/BodyContainer/HBoxContainer2"]
+layout_mode = 2
+text = "。"
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="VBoxContainer/LetterPaper/LetterContent/HBoxContainer2/BodyContainer"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Label" type="Label" parent="VBoxContainer/LetterPaper/LetterContent/HBoxContainer2/BodyContainer/HBoxContainer3"]
+layout_mode = 2
+text = "盼"
+
+[node name="BodySlot3" type="Button" parent="VBoxContainer/LetterPaper/LetterContent/HBoxContainer2/BodyContainer/HBoxContainer3"]
+layout_mode = 2
+text = "（填空3）"
+
+[node name="Label2" type="Label" parent="VBoxContainer/LetterPaper/LetterContent/HBoxContainer2/BodyContainer/HBoxContainer3"]
+layout_mode = 2
+text = "。"
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="VBoxContainer/LetterPaper/LetterContent"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Label" type="Label" parent="VBoxContainer/LetterPaper/LetterContent/HBoxContainer3"]
+layout_mode = 2
+text = "落款："
+
+[node name="SignatureOption" type="OptionButton" parent="VBoxContainer/LetterPaper/LetterContent/HBoxContainer3"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="WordPoolContainer" type="VBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SubmitBtn" type="Button" parent="VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+text = "提交"
+
+[node name="ResetBtn" type="Button" parent="VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+text = "重新填写"
+
+[node name="BackBtn" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "返回主界面"
+
+[node name="ResultDialog" type="ConfirmationDialog" parent="."]
+title = "结算确认"
+size = Vector2i(560, 320)
+
+[node name="DialogContent" type="VBoxContainer" parent="ResultDialog"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 12.0
+offset_right = -12.0
+offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 8
+
+[node name="ResultTitleLabel" type="Label" parent="ResultDialog/DialogContent"]
+layout_mode = 2
+text = "结算结果"
+autowrap_mode = 3
+
+[node name="FeeLabel" type="Label" parent="ResultDialog/DialogContent"]
+layout_mode = 2
+text = "本次收益：0文"
+autowrap_mode = 3
+
+[node name="FeedbackLabel" type="Label" parent="ResultDialog/DialogContent"]
+layout_mode = 2
+text = "（反馈内容）"
+autowrap_mode = 3

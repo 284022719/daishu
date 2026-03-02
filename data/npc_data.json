@@ -1,0 +1,167 @@
+[
+  {
+    "npc_id": 101,
+    "name": "张婆婆",
+    "first_day": 1,
+    "required_calligraphy": 0,
+    "avatar": "",
+    "description": "目不识丁的老妇人，儿子在苏州做工",
+    "letter_type": "家书",
+    "request_text": "给我儿子写封信，告诉他我在家挺好的，别惦记。问问他在那边过得好不好，天冷了记得添衣裳。要是方便的话，年底回家过年吧。",
+    "correct": {
+      "salutation": "吾儿如晤",
+      "body_slots": {
+        "slot1": "安好",
+        "slot2": "添衣",
+        "slot3": "归乡"
+      },
+      "signature": "母字"
+    },
+    "word_pool": {
+      "salutation": ["吾儿如晤", "吾儿见字", "儿亲启"],
+      "body_slot1": ["安好", "安康"],
+      "body_slot2": ["添衣", "保重"],
+      "body_slot3": ["归乡", "回家"],
+      "signature": ["母字", "娘亲", "母手书"]
+    },
+    "base_fee": 5,
+    "perfect_bonus": 3,
+    "feedback": {
+      "perfect": "先生写得真好，一看就明白！",
+      "normal": "写是写对了，但好像不是我说的意思……",
+      "wrong": "先生，这……这写的是啥呀？"
+    }
+  },
+  {
+    "npc_id": 102,
+    "name": "李屠户",
+    "first_day": 1,
+    "required_calligraphy": 0,
+    "avatar": "",
+    "description": "集市上的屠户，粗通文墨但不会写契约",
+    "letter_type": "契约",
+    "request_text": "我要卖给王员外家一口猪，说好三两银子，后天送过去。你帮我写清楚，别到时候扯皮。",
+    "correct": {
+      "salutation": "立契人李屠户",
+      "body_slots": {
+        "slot1": "肥猪一口",
+        "slot2": "三两银",
+        "slot3": "三日后交付"
+      },
+      "signature": "中人无"
+    },
+    "word_pool": {
+      "salutation": ["立契人李屠户", "李屠户"],
+      "body_slot1": ["肥猪一口", "生猪一头"],
+      "body_slot2": ["三两银", "纹银三两"],
+      "body_slot3": ["三日后交付", "后天送到"],
+      "signature": ["无", ""]
+    },
+    "base_fee": 8,
+    "perfect_bonus": 4,
+    "feedback": {
+      "perfect": "好好好，这下王员外赖不掉了！",
+      "normal": "嗯...差不多吧，别出事就行。",
+      "wrong": "这写的什么？错了错了！"
+    }
+  },
+  {
+    "npc_id": 103,
+    "name": "王书生",
+    "first_day": 1,
+    "required_calligraphy": 0,
+    "avatar": "",
+    "description": "年轻书生，想给卖花的翠儿写情书",
+    "letter_type": "情书",
+    "request_text": "我想给卖花的翠儿写封信……就说我很仰慕她，想约她明天去瓦子看戏。你帮我写得好听一点。",
+    "correct": {
+      "salutation": "翠儿妆次",
+      "body_slots": {
+        "slot1": "芳姿",
+        "slot2": "共赏瓦戏",
+        "slot3": "一诉衷肠"
+      },
+      "signature": "王生拜上"
+    },
+    "word_pool": {
+      "salutation": ["翠儿妆次", "翠儿亲启"],
+      "body_slot1": ["芳名", "芳姿"],
+      "body_slot2": ["看戏", "共赏瓦戏"],
+      "body_slot3": ["相见", "一诉衷肠"],
+      "signature": ["王生拜上", "王生谨启"]
+    },
+    "base_fee": 6,
+    "perfect_bonus": 5,
+    "feedback": {
+      "perfect": "妙哉！此信定能打动翠儿芳心！",
+      "normal": "虽然直白了些，倒也真诚。",
+      "wrong": "这……这写的什么？翠儿看了怕是要恼我。"
+    }
+  },
+  {
+    "npc_id": 104,
+    "name": "刘母",
+    "first_day": 3,
+    "required_calligraphy": 0,
+    "avatar": "",
+    "description": "病重的母亲，不想让儿子担心",
+    "letter_type": "家书",
+    "request_text": "给我儿子写封信，就说我一切都好，别让他担心。告诉他家里没事，好好干活，年底回来就行。（她说话时一直咳嗽）",
+    "correct": {
+      "salutation": "吾儿见字",
+      "body_slots": {
+        "slot1": "安好",
+        "slot2": "勿念",
+        "slot3": "年底归来"
+      },
+      "signature": "母字"
+    },
+    "word_pool": {
+      "salutation": ["吾儿见字", "吾儿如晤"],
+      "body_slot1": ["安好", "安康"],
+      "body_slot2": ["勿念", "莫挂"],
+      "body_slot3": ["年底归来", "早日回家"],
+      "signature": ["母字", "娘亲"]
+    },
+    "base_fee": 5,
+    "perfect_bonus": 3,
+    "feedback": {
+      "perfect": "谢谢先生，这样他就放心了。",
+      "normal": "行吧……",
+      "wrong": "不是，我不是这么说的啊！"
+    }
+  },
+  {
+    "npc_id": 105,
+    "name": "神秘人老周",
+    "first_day": 5,
+    "required_calligraphy": 1,
+    "avatar": "",
+    "description": "看似普通商人，实则青帮联络人",
+    "letter_type": "密信",
+    "request_text": "帮我写封家书，就说'生意顺利，下月进货'。请在'下月'两字中间点个小墨点，落款'弟'字写小一点。",
+    "correct": {
+      "salutation": "大哥亲启",
+      "body_slots": {
+        "slot1": "生意顺利",
+        "slot2": "下月进货",
+        "slot3": "诸事顺遂"
+      },
+      "signature": "弟"
+    },
+    "word_pool": {
+      "salutation": ["大哥亲启", "兄长如晤"],
+      "body_slot1": ["生意顺利", "买卖兴隆"],
+      "body_slot2": ["下月进货", "月底补货"],
+      "body_slot3": ["诸事顺遂", "一切平安"],
+      "signature": ["弟", "小弟"]
+    },
+    "base_fee": 10,
+    "perfect_bonus": 20,
+    "feedback": {
+      "perfect": "很好，这是额外的辛苦费。",
+      "normal": "就这样吧。",
+      "wrong": "不对不对，不是这样写的！"
+    }
+  }
+]
