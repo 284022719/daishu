@@ -1,10 +1,12 @@
-[gd_scene load_steps=5 format=3 uid="uid://djosxvyv0odo3"]
+[gd_scene load_steps=6 format=3 uid="uid://djosxvyv0odo3"]
 
 [ext_resource type="Script" uid="uid://co32gx0hwqxwf" path="res://scripts/letter.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://b43wo1f6igftl" path="res://assets/images/backgrounds/letter.png" id="2"]
 [ext_resource type="Script" uid="uid://fks6j0henc3b" path="res://scripts/letter_slot.gd" id="3"]
 
 [sub_resource type="StyleBoxEmpty" id="4_transparent"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_antxc"]
 
 [node name="Letter" type="Control"]
 layout_mode = 3
@@ -110,32 +112,26 @@ autowrap_mode = 3
 
 [node name="Slots" type="HBoxContainer" parent="HSplit/LetterPanel/LetterVBox"]
 layout_mode = 2
+size_flags_horizontal = 3
 size_flags_vertical = 3
-theme_override_constants/separation = 24
+theme_override_constants/separation = 40
 
 [node name="SalutationSlot" type="Panel" parent="HSplit/LetterPanel/LetterVBox/Slots"]
-custom_minimum_size = Vector2(40, 300)
+custom_minimum_size = Vector2(40, 260)
 layout_mode = 2
-size_flags_horizontal = 1
-theme_override_styles/panel = SubResource("4_transparent")
+theme_override_styles/panel = SubResource("StyleBoxEmpty_antxc")
 script = ExtResource("3")
 placeholder = "拖拽称谓到此处"
 
 [node name="TextLabel" type="Label" parent="HSplit/LetterPanel/LetterVBox/Slots/SalutationSlot"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+layout_mode = 0
+offset_right = 112.0
+offset_bottom = 23.0
 text = "拖拽称谓到此处"
-horizontal_alignment = 1
-vertical_alignment = 0
 
 [node name="BodySlot1" type="Panel" parent="HSplit/LetterPanel/LetterVBox/Slots"]
-custom_minimum_size = Vector2(40, 300)
+custom_minimum_size = Vector2(40, 260)
 layout_mode = 2
-size_flags_horizontal = 1
 theme_override_styles/panel = SubResource("4_transparent")
 script = ExtResource("3")
 slot_key = "body_slot1"
@@ -144,20 +140,14 @@ body_slot = "slot1"
 placeholder = "家中 ______"
 
 [node name="TextLabel" type="Label" parent="HSplit/LetterPanel/LetterVBox/Slots/BodySlot1"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+layout_mode = 0
+offset_right = 78.0
+offset_bottom = 23.0
 text = "家中 ______"
-horizontal_alignment = 1
-vertical_alignment = 0
 
 [node name="BodySlot2" type="Panel" parent="HSplit/LetterPanel/LetterVBox/Slots"]
-custom_minimum_size = Vector2(40, 300)
+custom_minimum_size = Vector2(40, 260)
 layout_mode = 2
-size_flags_horizontal = 1
 theme_override_styles/panel = SubResource("4_transparent")
 script = ExtResource("3")
 slot_key = "body_slot2"
@@ -166,20 +156,14 @@ body_slot = "slot2"
 placeholder = "在外 ______"
 
 [node name="TextLabel" type="Label" parent="HSplit/LetterPanel/LetterVBox/Slots/BodySlot2"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+layout_mode = 0
+offset_right = 78.0
+offset_bottom = 23.0
 text = "在外 ______"
-horizontal_alignment = 1
-vertical_alignment = 0
 
 [node name="BodySlot3" type="Panel" parent="HSplit/LetterPanel/LetterVBox/Slots"]
-custom_minimum_size = Vector2(40, 300)
+custom_minimum_size = Vector2(40, 260)
 layout_mode = 2
-size_flags_horizontal = 1
 theme_override_styles/panel = SubResource("4_transparent")
 script = ExtResource("3")
 slot_key = "body_slot3"
@@ -188,20 +172,14 @@ body_slot = "slot3"
 placeholder = "盼 ______"
 
 [node name="TextLabel" type="Label" parent="HSplit/LetterPanel/LetterVBox/Slots/BodySlot3"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+layout_mode = 0
+offset_right = 62.0
+offset_bottom = 23.0
 text = "盼 ______"
-horizontal_alignment = 1
-vertical_alignment = 0
 
 [node name="SignatureSlot" type="Panel" parent="HSplit/LetterPanel/LetterVBox/Slots"]
-custom_minimum_size = Vector2(40, 300)
+custom_minimum_size = Vector2(40, 260)
 layout_mode = 2
-size_flags_horizontal = 1
 theme_override_styles/panel = SubResource("4_transparent")
 script = ExtResource("3")
 slot_key = "signature"
@@ -209,15 +187,10 @@ expected_category = "signature"
 placeholder = "拖拽落款到此处"
 
 [node name="TextLabel" type="Label" parent="HSplit/LetterPanel/LetterVBox/Slots/SignatureSlot"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+layout_mode = 0
+offset_right = 112.0
+offset_bottom = 23.0
 text = "拖拽落款到此处"
-horizontal_alignment = 1
-vertical_alignment = 0
 
 [node name="ButtonBar" type="HBoxContainer" parent="."]
 layout_mode = 1
