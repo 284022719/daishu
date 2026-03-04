@@ -1,12 +1,12 @@
 extends Control
 
 # 左侧词库
+@onready var request_label: Label = $HSplit/WordPanel/WordVBox/RequestLabel
 @onready var salutation_container: VBoxContainer = $HSplit/WordPanel/WordVBox/SalutationContainer
 @onready var body_container: VBoxContainer = $HSplit/WordPanel/WordVBox/BodyContainer
 @onready var signature_container: VBoxContainer = $HSplit/WordPanel/WordVBox/SignatureContainer
 
 # 右侧信纸槽位
-@onready var request_label: Label = $HSplit/LetterPanel/LetterVBox/RequestLabel
 @onready var salutation_slot = $HSplit/LetterPanel/LetterVBox/Slots/SalutationSlot
 @onready var body_slot1 = $HSplit/LetterPanel/LetterVBox/Slots/BodySlot1
 @onready var body_slot2 = $HSplit/LetterPanel/LetterVBox/Slots/BodySlot2
@@ -18,7 +18,7 @@ extends Control
 @onready var reset_btn: Button = $ButtonBar/ResetBtn
 @onready var back_btn: Button = $ButtonBar/BackBtn
 @onready var result_popup: AcceptDialog = $ResultPopup
-@onready var result_label: Label = $ResultPopup/ResultLabel
+@onready var result_label: RichTextLabel = $ResultPopup/ResultLabel
 
 const WORD_BUTTON_SCRIPT := preload("res://scripts/word_button.gd")
 # 信纸毛笔字体（从 assets/fonts/hanchanlongcang.otf 加载）
@@ -97,7 +97,7 @@ func init_with_npc(npc_id: int) -> void:
 		print("错误：找不到NPC ID ", npc_id, "，current_day_npcs 数量: ", npc_manager.current_day_npcs.size())
 		return
 
-	request_label.text = _to_vertical(str(current_npc.get("request_text", "")))
+	request_label.text = str(current_npc.get("request_text", ""))
 
 	_build_word_pools()
 	reset_answers()

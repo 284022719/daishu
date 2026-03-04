@@ -2,7 +2,7 @@
   "mcpServers": {
     "godot": {
       "command": "node",
-      "args": ["/data/home/haier/daishu/godot-mcp/build/index.js"],
+      "args": ["D:/daishu/godot-mcp/build/index.js"],
       "env": {
         "DEBUG": "false"
       }

@@ -64,6 +64,10 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 8
 
+[node name="RequestLabel" type="Label" parent="HSplit/WordPanel/WordVBox"]
+layout_mode = 2
+text = "（口述内容）"
+
 [node name="SalutationLabel" type="Label" parent="HSplit/WordPanel/WordVBox"]
 layout_mode = 2
 text = "称谓词库"
@@ -105,11 +109,6 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 12
 
-[node name="RequestLabel" type="Label" parent="HSplit/LetterPanel/LetterVBox"]
-layout_mode = 2
-text = "（口述内容）"
-autowrap_mode = 3
-
 [node name="Slots" type="HBoxContainer" parent="HSplit/LetterPanel/LetterVBox"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -119,8 +118,12 @@ theme_override_constants/separation = 40
 [node name="SalutationSlot" type="Panel" parent="HSplit/LetterPanel/LetterVBox/Slots"]
 custom_minimum_size = Vector2(40, 260)
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxEmpty_antxc")
 script = ExtResource("3")
+slot_key = "salutation"
+expected_category = "salutation"
 placeholder = "拖拽称谓到此处"
 
 [node name="TextLabel" type="Label" parent="HSplit/LetterPanel/LetterVBox/Slots/SalutationSlot"]
@@ -132,6 +135,8 @@ text = "拖拽称谓到此处"
 [node name="BodySlot1" type="Panel" parent="HSplit/LetterPanel/LetterVBox/Slots"]
 custom_minimum_size = Vector2(40, 260)
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_override_styles/panel = SubResource("4_transparent")
 script = ExtResource("3")
 slot_key = "body_slot1"
@@ -148,6 +153,8 @@ text = "家中 ______"
 [node name="BodySlot2" type="Panel" parent="HSplit/LetterPanel/LetterVBox/Slots"]
 custom_minimum_size = Vector2(40, 260)
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_override_styles/panel = SubResource("4_transparent")
 script = ExtResource("3")
 slot_key = "body_slot2"
@@ -164,6 +171,8 @@ text = "在外 ______"
 [node name="BodySlot3" type="Panel" parent="HSplit/LetterPanel/LetterVBox/Slots"]
 custom_minimum_size = Vector2(40, 260)
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_override_styles/panel = SubResource("4_transparent")
 script = ExtResource("3")
 slot_key = "body_slot3"
@@ -180,6 +189,8 @@ text = "盼 ______"
 [node name="SignatureSlot" type="Panel" parent="HSplit/LetterPanel/LetterVBox/Slots"]
 custom_minimum_size = Vector2(40, 260)
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_override_styles/panel = SubResource("4_transparent")
 script = ExtResource("3")
 slot_key = "signature"
@@ -223,7 +234,7 @@ title = "结算结果"
 size = Vector2i(380, 220)
 min_size = Vector2i(320, 160)
 
-[node name="ResultLabel" type="Label" parent="ResultPopup"]
+[node name="ResultLabel" type="RichTextLabel" parent="ResultPopup"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -235,3 +246,4 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "（结算结果）"
 autowrap_mode = 3
+bbcode_enabled = true

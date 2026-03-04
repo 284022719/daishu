@@ -1,5 +1,5 @@
+res://godot-mcp/build/scripts/godot_operations.gd
 res://scenes/letter.tscn
-res://scenes/main.tscn
-res://scenes/title_screen.tscn
-res://scripts/main.gd
 res://scripts/letter.gd
+res://scripts/letter_slot.gd
+res://docs/readme.md
