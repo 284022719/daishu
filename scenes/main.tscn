@@ -1,7 +1,18 @@
-[gd_scene load_steps=3 format=3 uid="uid://bt30r1vr30vle"]
+[gd_scene load_steps=4 format=3 uid="uid://bt30r1vr30vle"]
 
 [ext_resource type="Script" uid="uid://6rfynpaylohb" path="res://scripts/main.gd" id="1_main"]
-[ext_resource type="Texture2D" uid="uid://btbgsav8b0tda" path="res://assets/images/backgrounds/market.png" id="2_0wfyh"]
+[ext_resource type="Texture2D" uid="uid://bpa0x45lgo3o0" path="res://assets/images/backgrounds/main_bg.png.png" id="2_0wfyh"]
+
+[sub_resource type="StyleBoxFlat" id="1_main_panel"]
+content_margin_left = 8.0
+content_margin_top = 8.0
+content_margin_right = 8.0
+content_margin_bottom = 8.0
+bg_color = Color(0.97, 0.95, 0.9, 0.9)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -12,80 +23,20 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_main")
 
-[node name="TextureRect" type="TextureRect" parent="."]
+[node name="Background" type="TextureRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 texture = ExtResource("2_0wfyh")
 expand_mode = 1
+stretch_mode = 5
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="MainPanel" type="Panel" parent="."]
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 10.0
-offset_top = 10.0
-offset_right = -10.0
-offset_bottom = -10.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/separation = 8
-
-[node name="StatusBar" type="HBoxContainer" parent="VBoxContainer"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="MoneyLabel" type="Label" parent="VBoxContainer/StatusBar"]
-layout_mode = 2
-text = "铜钱: 0"
-
-[node name="DayLabel" type="Label" parent="VBoxContainer/StatusBar"]
-layout_mode = 2
-text = "第 1 天"
-
-[node name="Spacer" type="Control" parent="VBoxContainer/StatusBar"]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="Label" type="Label" parent="VBoxContainer"]
-layout_mode = 2
-text = "今日可接委托："
-
-[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="NPCList" type="VBoxContainer" parent="VBoxContainer/ScrollContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-theme_override_constants/separation = 4
-
-[node name="ButtonBar" type="HBoxContainer" parent="VBoxContainer"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="StartDayBtn" type="Button" parent="VBoxContainer/ButtonBar"]
-layout_mode = 2
-text = "开始今日"
-
-[node name="EndDayBtn" type="Button" parent="VBoxContainer/ButtonBar"]
-layout_mode = 2
-text = "结束今日"
-
-[node name="SaveQuitBtn" type="Button" parent="VBoxContainer/ButtonBar"]
-layout_mode = 2
-text = "保存并退出"
-
-[node name="DaySettlementDialog" type="ConfirmationDialog" parent="."]
-title = "今日结算"
-size = Vector2i(640, 420)
-
-[node name="DialogContent" type="VBoxContainer" parent="DaySettlementDialog"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -95,18 +46,81 @@ offset_right = -12.0
 offset_bottom = -12.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_styles/panel = SubResource("1_main_panel")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MainPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_constants/separation = 8
 
-[node name="SummaryLabel" type="Label" parent="DaySettlementDialog/DialogContent"]
+[node name="StatusBar" type="HBoxContainer" parent="MainPanel/VBoxContainer"]
 layout_mode = 2
-text = "（今日结算摘要）"
-autowrap_mode = 3
+theme_override_constants/separation = 8
 
-[node name="DetailsScroll" type="ScrollContainer" parent="DaySettlementDialog/DialogContent"]
+[node name="MoneyLabel" type="Label" parent="MainPanel/VBoxContainer/StatusBar"]
+layout_mode = 2
+text = "铜钱: 0"
+
+[node name="DayLabel" type="Label" parent="MainPanel/VBoxContainer/StatusBar"]
+layout_mode = 2
+text = "第 1 天"
+
+[node name="Spacer" type="Control" parent="MainPanel/VBoxContainer/StatusBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="GoalLabel" type="Label" parent="MainPanel/VBoxContainer"]
+layout_mode = 2
+text = "目标：十日内攒够 500 文"
+
+[node name="Label" type="Label" parent="MainPanel/VBoxContainer"]
+layout_mode = 2
+text = "今日可接委托："
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MainPanel/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="DetailsLabel" type="RichTextLabel" parent="DaySettlementDialog/DialogContent/DetailsScroll"]
+[node name="NPCList" type="VBoxContainer" parent="MainPanel/VBoxContainer/ScrollContainer"]
 layout_mode = 2
-bbcode_enabled = true
-fit_content = true
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 4
+
+[node name="ButtonBar" type="HBoxContainer" parent="MainPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="StartDayBtn" type="Button" parent="MainPanel/VBoxContainer/ButtonBar"]
+layout_mode = 2
+text = "开始今日"
+
+[node name="EndDayBtn" type="Button" parent="MainPanel/VBoxContainer/ButtonBar"]
+layout_mode = 2
+text = "结束今日"
+
+[node name="SaveQuitBtn" type="Button" parent="MainPanel/VBoxContainer/ButtonBar"]
+layout_mode = 2
+text = "保存并退出"
+
+[node name="EndDayPopup" type="AcceptDialog" parent="."]
+title = "结束今日"
+size = Vector2i(340, 180)
+min_size = Vector2i(280, 120)
+
+[node name="EndDayLabel" type="Label" parent="EndDayPopup"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -49.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "（今日结算提示）"
+autowrap_mode = 3

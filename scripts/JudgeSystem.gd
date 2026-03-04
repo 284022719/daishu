@@ -10,7 +10,14 @@ func _check_item(safe_answers: Dictionary, word_pool: Dictionary, answer_key: St
 		state["format_errors"] = int(state.get("format_errors", 0)) + 1
 		return
 	
-	var pool: Array = word_pool.get(pool_key, [])
+	# 正文三项的词库在 word_pool.body_slots.slot1/2/3，不是 word_pool.body_slot1
+	var pool: Array
+	if pool_key.begins_with("body_slot"):
+		var body_slots: Dictionary = word_pool.get("body_slots", {})
+		var slot_name := pool_key  # body_slot1 -> 对应 body_slots.slot1（key 为 "slot1"）
+		pool = body_slots.get(slot_name.replace("body_", ""), [])
+	else:
+		pool = word_pool.get(pool_key, [])
 	if not pool.has(v):
 		state["format_errors"] = int(state.get("format_errors", 0)) + 1
 		return
@@ -65,11 +72,26 @@ func judge(npc: Dictionary, answers: Dictionary) -> Dictionary:
 		fee = base_fee + perfect_bonus
 		feedback_text = str(feedback.get("perfect", ""))
 	
+	# 每项是否正确，以及正确答案（供界面高亮用）
+	var correct_answers: Dictionary = {
+		"salutation": str(correct.get("salutation", "")).strip_edges(),
+		"body_slot1": str(correct_body.get("slot1", "")).strip_edges(),
+		"body_slot2": str(correct_body.get("slot2", "")).strip_edges(),
+		"body_slot3": str(correct_body.get("slot3", "")).strip_edges(),
+		"signature": str(correct.get("signature", "")).strip_edges()
+	}
+	var item_ok: Dictionary = {}
+	for key in correct_answers.keys():
+		var v := str(safe_answers.get(key, "")).strip_edges()
+		item_ok[key] = (v == correct_answers[key])
+	
 	return {
 		"fee": fee,
 		"feedback_text": feedback_text,
 		"result_code": result_code,
 		"perfect_count": correct_count,
 		"format_error_count": format_errors,
-		"content_mismatch_count": content_mismatch
+		"content_mismatch_count": content_mismatch,
+		"correct_answers": correct_answers,
+		"item_correct": item_ok
 	}

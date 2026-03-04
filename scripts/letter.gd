@@ -1,29 +1,39 @@
 extends Control
 
-# 节点引用
-@onready var npc_avatar = $VBoxContainer/HBoxContainer/NPCAvatar
-@onready var request_label = $VBoxContainer/HBoxContainer/RequestLabel
-@onready var salutation_option = $VBoxContainer/LetterPaper/LetterContent/HBoxContainer/SalutationOption
-@onready var body_slot1 = $VBoxContainer/LetterPaper/LetterContent/HBoxContainer2/BodyContainer/HBoxContainer/BodySlot1
-@onready var body_slot2 = $VBoxContainer/LetterPaper/LetterContent/HBoxContainer2/BodyContainer/HBoxContainer2/BodySlot2
-@onready var body_slot3 = $VBoxContainer/LetterPaper/LetterContent/HBoxContainer2/BodyContainer/HBoxContainer3/BodySlot3
-@onready var signature_option = $VBoxContainer/LetterPaper/LetterContent/HBoxContainer3/SignatureOption
-@onready var submit_btn = $VBoxContainer/HBoxContainer2/SubmitBtn
-@onready var reset_btn = $VBoxContainer/HBoxContainer2/ResetBtn
-@onready var back_btn = $VBoxContainer/BackBtn
-@onready var word_pool_container = $VBoxContainer/WordPoolContainer
-@onready var result_dialog: ConfirmationDialog = $ResultDialog
-@onready var result_title_label: Label = $ResultDialog/DialogContent/ResultTitleLabel
-@onready var fee_label: Label = $ResultDialog/DialogContent/FeeLabel
-@onready var feedback_label: Label = $ResultDialog/DialogContent/FeedbackLabel
+# 左侧词库
+@onready var salutation_container: VBoxContainer = $HSplit/WordPanel/WordVBox/SalutationContainer
+@onready var body_container: VBoxContainer = $HSplit/WordPanel/WordVBox/BodyContainer
+@onready var signature_container: VBoxContainer = $HSplit/WordPanel/WordVBox/SignatureContainer
+
+# 右侧信纸槽位
+@onready var request_label: Label = $HSplit/LetterPanel/LetterVBox/RequestLabel
+@onready var salutation_slot = $HSplit/LetterPanel/LetterVBox/Slots/SalutationSlot
+@onready var body_slot1 = $HSplit/LetterPanel/LetterVBox/Slots/BodySlot1
+@onready var body_slot2 = $HSplit/LetterPanel/LetterVBox/Slots/BodySlot2
+@onready var body_slot3 = $HSplit/LetterPanel/LetterVBox/Slots/BodySlot3
+@onready var signature_slot = $HSplit/LetterPanel/LetterVBox/Slots/SignatureSlot
+
+# 底部按钮与结算弹窗
+@onready var submit_btn: Button = $ButtonBar/SubmitBtn
+@onready var reset_btn: Button = $ButtonBar/ResetBtn
+@onready var back_btn: Button = $ButtonBar/BackBtn
+@onready var result_popup: AcceptDialog = $ResultPopup
+@onready var result_label: Label = $ResultPopup/ResultLabel
+
+const WORD_BUTTON_SCRIPT := preload("res://scripts/word_button.gd")
+# 信纸毛笔字体（从 assets/fonts/hanchanlongcang.otf 加载）
+const LETTER_FONT_PATH := "res://assets/fonts/hanchanlongcang.otf"
+const LETTER_FONT_SIZE := 22
+const LETTER_FONT_COLOR := Color.BLACK
 
 # 当前NPC数据
-var current_npc = {}
-var current_npc_id = 0
-var pending_result: Dictionary = {}
+var current_npc: Dictionary = {}
+var current_npc_id: int = 0
+var _npc_initialized := false
+var _pending_result: Dictionary = {}
 
-# 当前填写的答案
-var player_answers = {
+# 当前填写的答案（与判定系统兼容）
+var player_answers := {
 	"salutation": "",
 	"body_slot1": "",
 	"body_slot2": "",
@@ -31,181 +41,175 @@ var player_answers = {
 	"signature": ""
 }
 
-func _ready():
-	# 连接按钮信号
+func _ready() -> void:
 	submit_btn.pressed.connect(_on_submit_pressed)
 	reset_btn.pressed.connect(_on_reset_pressed)
 	back_btn.pressed.connect(_on_back_pressed)
-	
-	result_dialog.confirmed.connect(_on_result_confirmed)
-	result_dialog.canceled.connect(_on_result_canceled)
-	result_dialog.get_ok_button().text = "确认结算"
-	result_dialog.get_cancel_button().text = "继续修改"
-	
-	# 连接下拉框选择信号
-	salutation_option.item_selected.connect(_on_salutation_selected)
-	signature_option.item_selected.connect(_on_signature_selected)
-	
-	# 初始化（等数据传入后再填充）
+	result_popup.confirmed.connect(_on_result_popup_confirmed)
+	result_popup.get_ok_button().text = "确认"
+
+	# 槽位接收拖拽后，更新 player_answers
+	for slot in [salutation_slot, body_slot1, body_slot2, body_slot3, signature_slot]:
+		slot.word_dropped.connect(_on_slot_word_dropped)
+
+	# 信纸区域使用毛笔字体（若存在 maobi.ttf）
+	_apply_letter_font()
+
+# 为右侧信纸区域所有 Label 应用毛笔字体与墨色
+func _apply_letter_font() -> void:
+	if not ResourceLoader.exists(LETTER_FONT_PATH):
+		return
+	var font: Font = load(LETTER_FONT_PATH) as Font
+	if font == null:
+		return
+	var letter_vbox: VBoxContainer = $HSplit/LetterPanel/LetterVBox
+	_apply_font_to_labels(letter_vbox, font)
+
+func _apply_font_to_labels(control: Control, font: Font) -> void:
+	if control is Label:
+		control.add_theme_font_override("font", font)
+		control.add_theme_font_size_override("font_size", LETTER_FONT_SIZE)
+		control.add_theme_color_override("font_color", LETTER_FONT_COLOR)
+		# 轻微描边模拟墨迹
+		control.add_theme_constant_override("outline_size", 1)
+		control.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.4))
+	for child in control.get_children():
+		if child is Control:
+			_apply_font_to_labels(child, font)
+
+# 竖排：每字一行，自上而下（中国古代书写习惯）
+func _to_vertical(s: String) -> String:
+	if s.is_empty():
+		return ""
+	var lines: PackedStringArray = []
+	for i in range(s.length()):
+		lines.append(s[i])
+	return "\n".join(lines)
 
 # 初始化界面，由主界面调用
-func init_with_npc(npc_id: int):
-	current_npc_id = npc_id
+func init_with_npc(npc_id: int) -> void:
+	_npc_initialized = false
+	current_npc_id = int(npc_id)
 	var npc_manager = get_node("/root/NPCManager")
-	current_npc = npc_manager.get_npc_by_id(npc_id)
-	
+	current_npc = npc_manager.get_npc_by_id(current_npc_id)
+
 	if current_npc.is_empty():
-		print("错误：找不到NPC ID ", npc_id)
+		print("错误：找不到NPC ID ", npc_id, "，current_day_npcs 数量: ", npc_manager.current_day_npcs.size())
 		return
-	
-	# 显示NPC口述文本
-	request_label.text = current_npc["request_text"]
-	
-	# TODO: 设置头像（如果有资源的话）
-	
-	# 填充称谓下拉框
-	fill_salutation_options()
-	
-	# 填充落款下拉框
-	fill_signature_options()
-	
-	# 创建词库按钮
-	create_word_pool_buttons()
-	
-	# 重置玩家答案
+
+	request_label.text = _to_vertical(str(current_npc.get("request_text", "")))
+
+	_build_word_pools()
 	reset_answers()
+	_npc_initialized = true
 
-# 填充称谓下拉框
-func fill_salutation_options():
-	salutation_option.clear()
-	var salutation_pool = current_npc["word_pool"]["salutation"]
-	for text in salutation_pool:
-		salutation_option.add_item(text)
+func _build_word_pools() -> void:
+	# 清空旧的词库按钮
+	for c in [salutation_container, body_container, signature_container]:
+		for child in c.get_children():
+			child.queue_free()
 
-# 填充落款下拉框
-func fill_signature_options():
-	signature_option.clear()
-	var signature_pool = current_npc["word_pool"]["signature"]
-	for text in signature_pool:
-		signature_option.add_item(text)
+	var word_pool: Dictionary = current_npc.get("word_pool", {})
 
-# 创建词库按钮（正文填空用）
-func create_word_pool_buttons():
-	# 清空之前的按钮
-	for child in word_pool_container.get_children():
-		child.queue_free()
-	
-	# 获取正文各空位的词库（支持 body_slots 或 body_slot1/2/3 两种格式）
-	var body_pool = {}
-	if current_npc["word_pool"].has("body_slots"):
-		body_pool = current_npc["word_pool"]["body_slots"]
-	else:
-		body_pool = {
-			"slot1": current_npc["word_pool"].get("body_slot1", []),
-			"slot2": current_npc["word_pool"].get("body_slot2", []),
-			"slot3": current_npc["word_pool"].get("body_slot3", [])
-		}
-	
-	for slot_name in body_pool.keys():
-		var slot_label = Label.new()
-		slot_label.text = slot_name + ": "
-		word_pool_container.add_child(slot_label)
-		
-		var button_row = HBoxContainer.new()
-		for word in body_pool[slot_name]:
-			var btn = Button.new()
-			btn.text = word
-			btn.set_meta("slot_name", slot_name)
-			btn.set_meta("word", word)
-			btn.pressed.connect(_on_word_button_pressed.bind(btn))
-			button_row.add_child(btn)
-		word_pool_container.add_child(button_row)
+	# 称谓词库
+	for text in word_pool.get("salutation", []):
+		_add_word_button(salutation_container, str(text), "salutation", "")
 
-# 点击词库按钮：填充对应的填空
-func _on_word_button_pressed(btn):
-	var slot_name = btn.get_meta("slot_name")
-	var word = btn.get_meta("word")
-	
-	# 根据slot_name更新对应的填空按钮文本
-	match slot_name:
-		"slot1":
-			body_slot1.text = word
+	# 正文词库（body_slots.slot1/2/3）
+	var body_slots: Dictionary = word_pool.get("body_slots", {})
+	for slot_name in ["slot1", "slot2", "slot3"]:
+		var row := HBoxContainer.new()
+		body_container.add_child(row)
+		for text in body_slots.get(slot_name, []):
+			_add_word_button(row, str(text), "body", slot_name)
+
+	# 落款词库
+	for text in word_pool.get("signature", []):
+		_add_word_button(signature_container, str(text), "signature", "")
+
+func _add_word_button(parent: Node, text: String, category: String, body_slot: String) -> void:
+	var btn := Button.new()
+	btn.set_script(WORD_BUTTON_SCRIPT)
+	btn.text = text
+	btn.category = category
+	btn.body_slot = body_slot
+	parent.add_child(btn)
+
+func _on_slot_word_dropped(slot_key: String, word: String) -> void:
+	match slot_key:
+		"salutation":
+			player_answers["salutation"] = word
+		"body_slot1":
 			player_answers["body_slot1"] = word
-		"slot2":
-			body_slot2.text = word
+		"body_slot2":
 			player_answers["body_slot2"] = word
-		"slot3":
-			body_slot3.text = word
+		"body_slot3":
 			player_answers["body_slot3"] = word
+		"signature":
+			player_answers["signature"] = word
 
-# 称谓选择
-func _on_salutation_selected(index: int):
-	var text = salutation_option.get_item_text(index)
-	player_answers["salutation"] = text
-
-# 落款选择
-func _on_signature_selected(index: int):
-	var text = signature_option.get_item_text(index)
-	player_answers["signature"] = text
-
-# 提交按钮
-func _on_submit_pressed():
-	# 按设计：未填写/未选择视为格式错误，因此不自动补默认值
+# 提交按钮：弹出结算结果，确认后再结算并返回
+func _on_submit_pressed() -> void:
+	if not _npc_initialized or current_npc.is_empty():
+		return
 	var result: Dictionary = JudgeSystem.judge(current_npc, player_answers)
-	pending_result = result
-	_update_result_dialog(pending_result)
-	result_dialog.popup_centered()
-
-func _update_result_dialog(result: Dictionary) -> void:
-	var result_code := str(result.get("result_code", ""))
+	_pending_result = result
 	var fee := int(result.get("fee", 0))
-	var format_err := int(result.get("format_error_count", 0))
-	var content_mis := int(result.get("content_mismatch_count", 0))
-	var perfect_count := int(result.get("perfect_count", 0))
-	
-	var title := "结算结果"
-	match result_code:
-		"PERFECT":
-			title = "结算结果：完美（5/5 正确）"
-		"NORMAL":
-			title = "结算结果：普通（正确 %d 项，内容不匹配 %d 项）" % [perfect_count, content_mis]
-		"WRONG":
-			title = "结算结果：错误（格式错误 %d 项）" % format_err
-	result_title_label.text = title
-	
+	var feedback_text := str(result.get("feedback_text", ""))
+	var line1 := ""
 	if fee < 0:
-		fee_label.text = "扣钱：%d文（净收入：-%d文）" % [abs(fee), abs(fee)]
+		line1 = "扣钱：%d 文" % abs(fee)
 	else:
-		fee_label.text = "获得：%d文" % fee
-	
-	feedback_label.text = str(result.get("feedback_text", ""))
+		line1 = "获得：%d 文" % fee
+	var correct_answers: Dictionary = result.get("correct_answers", {})
+	var item_correct: Dictionary = result.get("item_correct", {})
+	var answer_block := _build_answer_highlight(correct_answers, item_correct)
+	result_label.text = line1 + "\n\n" + feedback_text + answer_block
+	result_popup.popup_centered()
 
-func _on_result_confirmed() -> void:
-	# 确认后再结算并返回主界面
-	var fee := int(pending_result.get("fee", 0))
+# 生成带高亮的“正确答案”区块（BBCode：绿色=正确，错项旁显示玩家所填）
+func _build_answer_highlight(correct_answers: Dictionary, item_correct: Dictionary) -> String:
+	if correct_answers.is_empty():
+		return ""
+	var c := correct_answers
+	var ok := item_correct
+	var slot1 := str(c.get("body_slot1", ""))
+	var slot2 := str(c.get("body_slot2", ""))
+	var slot3 := str(c.get("body_slot3", ""))
+	var sal := str(c.get("salutation", ""))
+	var sig := str(c.get("signature", ""))
+	var lines: Array[String] = []
+	lines.append("\n\n——— [color=#27ae60]正确答案[/color] ———")
+	var sal_extra := " （你填：%s）" % player_answers.get("salutation", "") if not ok.get("salutation", true) else ""
+	lines.append("称谓：[color=#27ae60]%s[/color]%s" % [sal, sal_extra])
+	lines.append("正文：家中[color=#27ae60]%s[/color]%s，在外[color=#27ae60]%s[/color]%s，盼[color=#27ae60]%s[/color]%s。" % [
+		slot1, " （你填：%s）" % player_answers.get("body_slot1", "") if not ok.get("body_slot1", true) else "",
+		slot2, " （你填：%s）" % player_answers.get("body_slot2", "") if not ok.get("body_slot2", true) else "",
+		slot3, " （你填：%s）" % player_answers.get("body_slot3", "") if not ok.get("body_slot3", true) else ""
+	])
+	var sig_extra := " （你填：%s）" % player_answers.get("signature", "") if not ok.get("signature", true) else ""
+	lines.append("落款：[color=#27ae60]%s[/color]%s" % [sig, sig_extra])
+	return "\n".join(lines)
+
+func _on_result_popup_confirmed() -> void:
+	var fee := int(_pending_result.get("fee", 0))
 	var npc_name := str(current_npc.get("name", "未知NPC"))
 	PlayerManager.record_entry("commission", fee, "%s 委托结算" % npc_name, {"npc_id": current_npc_id, "npc_name": npc_name})
 	PlayerManager.add_money(fee)
 	return_to_main()
 
-func _on_result_canceled() -> void:
-	# 继续修改：不结算、不退出
-	pass
-
 # 重新填写按钮
-func _on_reset_pressed():
+func _on_reset_pressed() -> void:
 	reset_answers()
 
-func reset_answers():
-	# 清空填空按钮文本
-	body_slot1.text = ""
-	body_slot2.text = ""
-	body_slot3.text = ""
-	
-	# 重置下拉框选择（不选任何项）
-	salutation_option.select(-1)
-	signature_option.select(-1)
-	
+func reset_answers() -> void:
+	# 清空槽位显示
+	salutation_slot.clear_slot()
+	body_slot1.clear_slot()
+	body_slot2.clear_slot()
+	body_slot3.clear_slot()
+	signature_slot.clear_slot()
+
 	# 清空答案记录
 	player_answers = {
 		"salutation": "",
@@ -216,13 +220,15 @@ func reset_answers():
 	}
 
 # 返回主界面（显示主界面并移除代写界面，保留主界面状态）
-func _on_back_pressed():
+func _on_back_pressed() -> void:
 	return_to_main()
 
 func return_to_main() -> void:
-	var main = get_tree().root.get_node_or_null("Main")  # 确保主场景节点名为 Main
+	var main = get_tree().root.get_node_or_null("Main")
 	if main:
 		if main.has_method("on_npc_completed"):
 			main.on_npc_completed(current_npc_id)
 		main.show()
+		if main.has_method("update_ui"):
+			main.update_ui()
 	queue_free()

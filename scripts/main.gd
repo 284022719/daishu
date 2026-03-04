@@ -1,21 +1,22 @@
 extends Control
 
 # 节点引用
-@onready var money_label = $VBoxContainer/StatusBar/MoneyLabel
-@onready var day_label = $VBoxContainer/StatusBar/DayLabel
-@onready var npc_list_container = $VBoxContainer/ScrollContainer/NPCList
-@onready var start_day_btn = $VBoxContainer/ButtonBar/StartDayBtn
-@onready var end_day_btn = $VBoxContainer/ButtonBar/EndDayBtn
-@onready var save_quit_btn = $VBoxContainer/ButtonBar/SaveQuitBtn
-@onready var day_settlement_dialog: ConfirmationDialog = $DaySettlementDialog
-@onready var settlement_summary_label: Label = $DaySettlementDialog/DialogContent/SummaryLabel
-@onready var settlement_details_label: RichTextLabel = $DaySettlementDialog/DialogContent/DetailsScroll/DetailsLabel
+@onready var money_label = $MainPanel/VBoxContainer/StatusBar/MoneyLabel
+@onready var day_label = $MainPanel/VBoxContainer/StatusBar/DayLabel
+@onready var npc_list_container = $MainPanel/VBoxContainer/ScrollContainer/NPCList
+@onready var start_day_btn = $MainPanel/VBoxContainer/ButtonBar/StartDayBtn
+@onready var end_day_btn = $MainPanel/VBoxContainer/ButtonBar/EndDayBtn
+@onready var save_quit_btn = $MainPanel/VBoxContainer/ButtonBar/SaveQuitBtn
+@onready var end_day_popup: AcceptDialog = $EndDayPopup
+@onready var end_day_label: Label = $EndDayPopup/EndDayLabel
 
 func _ready():
 	# 连接按钮信号
 	start_day_btn.pressed.connect(_on_start_day_pressed)
 	end_day_btn.pressed.connect(_on_end_day_pressed)
 	save_quit_btn.pressed.connect(_on_save_quit_pressed)
+	end_day_popup.confirmed.connect(_on_end_day_popup_confirmed)
+	end_day_popup.get_ok_button().text = "确认"
 	
 	# 监听玩家状态变化并刷新 UI
 	PlayerManager.money_changed.connect(_on_money_changed)
@@ -26,18 +27,13 @@ func _ready():
 	
 	# 默认不显示NPC列表（等点击“开始今日”后显示）
 	clear_npc_list()
-	
-	day_settlement_dialog.confirmed.connect(_on_settlement_confirmed)
-	day_settlement_dialog.canceled.connect(_on_settlement_canceled)
-	day_settlement_dialog.get_ok_button().text = "确认结算并进入下一天"
-	day_settlement_dialog.get_cancel_button().text = "返回继续接单"
 
 func add_money(delta: int) -> void:
 	PlayerManager.add_money(delta)
 
 func update_ui():
 	money_label.text = "铜钱: " + str(PlayerManager.money) + "文"
-	day_label.text = "第 " + str(PlayerManager.day) + " 日"
+	day_label.text = "第 %d 日 / 共 %d 日" % [PlayerManager.day, PlayerManager.TOTAL_DAYS]
 
 func _on_money_changed(_new_money: int) -> void:
 	update_ui()
@@ -58,7 +54,7 @@ func _on_start_day_pressed():
 		print("错误：找不到NPCManager")
 		return
 	
-	var today_npcs = npc_manager.get_today_npcs(PlayerManager.day, PlayerManager.completed_npcs)
+	var today_npcs = npc_manager.get_today_npcs(PlayerManager.day)
 	print("今日NPC数量：", today_npcs.size())
 	
 	# 清空之前的列表
@@ -92,56 +88,36 @@ func _on_npc_button_pressed(btn):
 	var letter_instance = letter_scene.instantiate()
 	get_tree().root.add_child(letter_instance)
 	
-	# 调用初始化函数
-	letter_instance.init_with_npc(npc_id)
+	# 调用初始化函数（确保传入 int，与 NPCManager 查找一致）
+	letter_instance.init_with_npc(int(npc_id))
 	
 	# 隐藏主界面（可选）
 	self.hide()
 
 func _on_end_day_pressed():
-	print("结束今日")
-	_show_day_settlement()
-
-func _show_day_settlement() -> void:
 	var summary: Dictionary = PlayerManager.get_day_summary()
 	var income := int(summary.get("income", 0))
 	var expense := int(summary.get("expense", 0))
-	var stall_fee := int(summary.get("stall_fee", 0))
+	var stall_fee := int(summary.get("stall_fee", 23))
 	var net := int(summary.get("net", 0))
-	var entries: Array = summary.get("entries", [])
-	
-	settlement_summary_label.text = "第 %d 日结算：收入 %d 文，扣除 %d 文，摊位费 %d 文，净收益 %d 文" % [PlayerManager.day, income, expense, stall_fee, net]
-	
-	var lines: Array[String] = []
-	if entries.is_empty():
-		lines.append("（今日暂无委托结算记录）")
-	else:
-		for e in entries:
-			var desc := str(e.get("desc", ""))
-			var amount := int(e.get("amount", 0))
-			if amount < 0:
-				lines.append("- %s：扣钱 %d 文" % [desc, abs(amount)])
-			else:
-				lines.append("- %s：获得 %d 文" % [desc, amount])
-	lines.append("")
-	lines.append("- 摊位费：扣钱 %d 文" % stall_fee)
-	
-	settlement_details_label.text = "[b]当日收入明细[/b]\n" + "\n".join(lines)
-	day_settlement_dialog.popup_centered()
+	var lines := "第 %d 日结算\n\n" % PlayerManager.day
+	lines += "今日收入：%d 文\n" % income
+	lines += "今日扣除：%d 文\n" % expense
+	lines += "固定支出（摊位+房租+米钱）：%d 文\n\n" % stall_fee
+	lines += "净收益：%d 文\n" % net
+	lines += "确认后进入下一天。"
+	end_day_label.text = lines
+	end_day_popup.popup_centered()
 
-func _on_settlement_confirmed() -> void:
-	# 扣除摊位费、进入下一天、清空当日状态
+func _on_end_day_popup_confirmed() -> void:
 	PlayerManager.apply_end_of_day_costs()
 	PlayerManager.next_day()
 	PlayerManager.reset_day_ledger()
 	PlayerManager.reset_completed_npcs()
 	clear_npc_list()
-
-func _on_settlement_canceled() -> void:
-	# 继续留在当天，不做任何结算动作
-	pass
+	update_ui()
 
 func _on_save_quit_pressed():
 	print("保存并退出")
-	PlayerManager.save_game()
-	get_tree().quit()
+	PlayerManager.save()
+	get_tree().change_scene_to_file("res://scenes/title_screen.tscn")

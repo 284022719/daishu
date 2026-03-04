@@ -1,0 +1,23 @@
+extends Control
+
+@export var is_success: bool = false
+
+@onready var message_label: Label = $VBoxContainer/MessageLabel
+@onready var restart_button: Button = $VBoxContainer/Buttons/RestartButton
+@onready var quit_button: Button = $VBoxContainer/Buttons/QuitButton
+
+func _ready() -> void:
+	if is_success:
+		message_label.text = "恭喜！你凑齐了进京的路费，得以赶赴科考。金榜题名，从此改变命运……"
+	else:
+		message_label.text = "路费不足，你错过了今年的科考。壮志难酬，只得回乡另谋生计……"
+	restart_button.pressed.connect(_on_restart_pressed)
+	quit_button.pressed.connect(_on_quit_pressed)
+
+func _on_restart_pressed() -> void:
+	PlayerManager.reset()
+	get_tree().change_scene_to_file("res://scenes/title_screen.tscn")
+
+func _on_quit_pressed() -> void:
+	get_tree().quit()
+

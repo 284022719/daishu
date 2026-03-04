@@ -1,2 +1,5 @@
-res://scenes/main.tscn
 res://scenes/letter.tscn
+res://scenes/main.tscn
+res://scenes/title_screen.tscn
+res://scripts/main.gd
+res://scripts/letter.gd
