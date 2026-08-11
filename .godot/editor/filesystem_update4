@@ -1,5 +1,6 @@
-res://godot-mcp/build/scripts/godot_operations.gd
-res://scenes/letter.tscn
-res://scripts/letter.gd
-res://scripts/letter_slot.gd
 res://docs/readme.md
+res://scripts/letter_slot.gd
+res://scripts/NPCManager.gd
+res://scripts/PlayerManager.gd
+res://scripts/letter.gd
+res://scenes/letter.tscn

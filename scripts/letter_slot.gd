@@ -96,6 +96,5 @@ func _on_mouse_entered() -> void:
 		modulate = Color(1.02, 1.02, 1.0)
 
 func _on_mouse_exited() -> void:
-	# 离开时，如果不是“选中高亮”（绿色调），恢复基础颜色
-	if modulate.r > 1.0 or modulate.g > 1.0:
+	if modulate != _base_modulate:
 		modulate = _base_modulate

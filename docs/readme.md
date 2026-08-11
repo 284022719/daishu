@@ -4,7 +4,7 @@
 一、项目简介
 游戏名称：代书（暂名）
 一句话概括：像素风、明中期代笔先生模拟器，在《Paper, Please》式的日常劳作中，通过代写书信见证市井悲欢。
-核心玩法：玩家扮演贫寒书生，在30天内通过代写书信攒够500文进京路费。每日随机出现3位委托人，玩家需在竖排信纸上拖拽词库中的词语填充称谓、正文三空及落款，提交后由系统判定格式与内容准确度，获得相应报酬。
+核心玩法：玩家扮演贫寒书生，在10天内通过代写书信攒够500文进京路费。每日随机出现3位委托人，玩家需在竖排信纸上拖拽词库中的词语填充称谓、正文三空及落款，提交后由系统判定格式与内容准确度，获得相应报酬。
 游戏背景：明朝成化年间，市井生活与赶考压力交织。
 当前状态：已完成核心循环、随机NPC生成、判定系统、存档系统、结局触发及基础UI，进入美术素材优化阶段。
 
@@ -27,7 +27,7 @@ text
 PlayerManager
 信号：money_changed, day_changed, day_ledger_changed
 
-常量：STALL_FEE_PER_DAY = 23, TOTAL_DAYS = 30, TARGET_MONEY = 500
+常量：STALL_FEE_PER_DAY = 10, TOTAL_DAYS = 10, TARGET_MONEY = 500
 
 核心方法：
 
@@ -48,7 +48,7 @@ NPCManager
 
 generate_random_npc()：生成一个完整的随机NPC字典
 
-get_today_npcs(day)：返回当日3个NPC（忽略day参数，全部随机）
+get_today_npcs(day)：返回当日3个NPC，奖励随天数递增
 
 get_npc_by_id(id)：在当日列表中查找NPC
 

@@ -25,7 +25,7 @@ theme_override_constants/separation = 16
 
 [node name="MessageLabel" type="Label" parent="VBoxContainer"]
 layout_mode = 2
-text = "你未能攒够150文，生意失败……"
+text = "你未能攒够500文，生意失败……"
 autowrap_mode = 3
 
 [node name="Buttons" type="HBoxContainer" parent="VBoxContainer"]

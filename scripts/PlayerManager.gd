@@ -78,7 +78,6 @@ func get_day_summary() -> Dictionary:
 	}
 
 func apply_end_of_day_costs() -> void:
-	# 每日固定支出：摊位5 + 房租15 + 米钱3 = 23 文
 	add_money(-STALL_FEE_PER_DAY)
 
 func reset_day_ledger() -> void:

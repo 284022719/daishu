@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://djosxvyv0odo3"]
+[gd_scene format=3 uid="uid://djosxvyv0odo3"]
 
 [ext_resource type="Script" uid="uid://co32gx0hwqxwf" path="res://scripts/letter.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://b43wo1f6igftl" path="res://assets/images/backgrounds/letter.png" id="2"]
@@ -8,7 +8,7 @@
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_antxc"]
 
-[node name="Letter" type="Control"]
+[node name="Letter" type="Control" unique_id=1343437158]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -17,7 +17,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
 
-[node name="Background" type="TextureRect" parent="."]
+[node name="Background" type="TextureRect" parent="." unique_id=1701065856]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -33,7 +33,7 @@ texture = ExtResource("2")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="HSplit" type="HSplitContainer" parent="."]
+[node name="HSplit" type="HSplitContainer" parent="." unique_id=387580591]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -45,13 +45,15 @@ offset_bottom = -70.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 16
+split_offsets = PackedInt32Array(355)
+dragging_enabled = false
 split_offset = 355
 
-[node name="WordPanel" type="Panel" parent="HSplit"]
+[node name="WordPanel" type="Panel" parent="HSplit" unique_id=837201446]
 layout_mode = 2
 theme_override_styles/panel = SubResource("4_transparent")
 
-[node name="WordVBox" type="VBoxContainer" parent="HSplit/WordPanel"]
+[node name="WordVBox" type="VBoxContainer" parent="HSplit/WordPanel" unique_id=330910408]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -64,39 +66,35 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 8
 
-[node name="RequestLabel" type="Label" parent="HSplit/WordPanel/WordVBox"]
-layout_mode = 2
-text = "（口述内容）"
-
-[node name="SalutationLabel" type="Label" parent="HSplit/WordPanel/WordVBox"]
+[node name="SalutationLabel" type="Label" parent="HSplit/WordPanel/WordVBox" unique_id=259297334]
 layout_mode = 2
 text = "称谓词库"
 
-[node name="SalutationContainer" type="VBoxContainer" parent="HSplit/WordPanel/WordVBox"]
+[node name="SalutationContainer" type="VBoxContainer" parent="HSplit/WordPanel/WordVBox" unique_id=1426329187]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="BodyLabel" type="Label" parent="HSplit/WordPanel/WordVBox"]
+[node name="BodyLabel" type="Label" parent="HSplit/WordPanel/WordVBox" unique_id=1240825842]
 layout_mode = 2
 text = "正文词库"
 
-[node name="BodyContainer" type="VBoxContainer" parent="HSplit/WordPanel/WordVBox"]
+[node name="BodyContainer" type="VBoxContainer" parent="HSplit/WordPanel/WordVBox" unique_id=1724123747]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="SignatureLabel" type="Label" parent="HSplit/WordPanel/WordVBox"]
+[node name="SignatureLabel" type="Label" parent="HSplit/WordPanel/WordVBox" unique_id=414911630]
 layout_mode = 2
 text = "落款词库"
 
-[node name="SignatureContainer" type="VBoxContainer" parent="HSplit/WordPanel/WordVBox"]
+[node name="SignatureContainer" type="VBoxContainer" parent="HSplit/WordPanel/WordVBox" unique_id=1557443042]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="LetterPanel" type="Panel" parent="HSplit"]
+[node name="LetterPanel" type="Panel" parent="HSplit" unique_id=409583265]
 layout_mode = 2
 theme_override_styles/panel = SubResource("4_transparent")
 
-[node name="LetterVBox" type="VBoxContainer" parent="HSplit/LetterPanel"]
+[node name="LetterVBox" type="VBoxContainer" parent="HSplit/LetterPanel" unique_id=646064789]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -109,13 +107,17 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 12
 
-[node name="Slots" type="HBoxContainer" parent="HSplit/LetterPanel/LetterVBox"]
+[node name="RequestLabel" type="Label" parent="HSplit/LetterPanel/LetterVBox" unique_id=2034702877]
+layout_mode = 2
+text = "（口述内容）"
+
+[node name="Slots" type="HBoxContainer" parent="HSplit/LetterPanel/LetterVBox" unique_id=98025117]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/separation = 40
 
-[node name="SalutationSlot" type="Panel" parent="HSplit/LetterPanel/LetterVBox/Slots"]
+[node name="SalutationSlot" type="Panel" parent="HSplit/LetterPanel/LetterVBox/Slots" unique_id=1281543972]
 custom_minimum_size = Vector2(40, 260)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -126,13 +128,13 @@ slot_key = "salutation"
 expected_category = "salutation"
 placeholder = "拖拽称谓到此处"
 
-[node name="TextLabel" type="Label" parent="HSplit/LetterPanel/LetterVBox/Slots/SalutationSlot"]
+[node name="TextLabel" type="Label" parent="HSplit/LetterPanel/LetterVBox/Slots/SalutationSlot" unique_id=880520190]
 layout_mode = 0
 offset_right = 112.0
 offset_bottom = 23.0
 text = "拖拽称谓到此处"
 
-[node name="BodySlot1" type="Panel" parent="HSplit/LetterPanel/LetterVBox/Slots"]
+[node name="BodySlot1" type="Panel" parent="HSplit/LetterPanel/LetterVBox/Slots" unique_id=2051957997]
 custom_minimum_size = Vector2(40, 260)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -144,13 +146,13 @@ expected_category = "body"
 body_slot = "slot1"
 placeholder = "家中 ______"
 
-[node name="TextLabel" type="Label" parent="HSplit/LetterPanel/LetterVBox/Slots/BodySlot1"]
+[node name="TextLabel" type="Label" parent="HSplit/LetterPanel/LetterVBox/Slots/BodySlot1" unique_id=470724345]
 layout_mode = 0
 offset_right = 78.0
 offset_bottom = 23.0
 text = "家中 ______"
 
-[node name="BodySlot2" type="Panel" parent="HSplit/LetterPanel/LetterVBox/Slots"]
+[node name="BodySlot2" type="Panel" parent="HSplit/LetterPanel/LetterVBox/Slots" unique_id=730639774]
 custom_minimum_size = Vector2(40, 260)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -162,13 +164,13 @@ expected_category = "body"
 body_slot = "slot2"
 placeholder = "在外 ______"
 
-[node name="TextLabel" type="Label" parent="HSplit/LetterPanel/LetterVBox/Slots/BodySlot2"]
+[node name="TextLabel" type="Label" parent="HSplit/LetterPanel/LetterVBox/Slots/BodySlot2" unique_id=105316967]
 layout_mode = 0
 offset_right = 78.0
 offset_bottom = 23.0
 text = "在外 ______"
 
-[node name="BodySlot3" type="Panel" parent="HSplit/LetterPanel/LetterVBox/Slots"]
+[node name="BodySlot3" type="Panel" parent="HSplit/LetterPanel/LetterVBox/Slots" unique_id=440605257]
 custom_minimum_size = Vector2(40, 260)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -180,13 +182,13 @@ expected_category = "body"
 body_slot = "slot3"
 placeholder = "盼 ______"
 
-[node name="TextLabel" type="Label" parent="HSplit/LetterPanel/LetterVBox/Slots/BodySlot3"]
+[node name="TextLabel" type="Label" parent="HSplit/LetterPanel/LetterVBox/Slots/BodySlot3" unique_id=503473708]
 layout_mode = 0
 offset_right = 62.0
 offset_bottom = 23.0
 text = "盼 ______"
 
-[node name="SignatureSlot" type="Panel" parent="HSplit/LetterPanel/LetterVBox/Slots"]
+[node name="SignatureSlot" type="Panel" parent="HSplit/LetterPanel/LetterVBox/Slots" unique_id=1836985505]
 custom_minimum_size = Vector2(40, 260)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -197,13 +199,13 @@ slot_key = "signature"
 expected_category = "signature"
 placeholder = "拖拽落款到此处"
 
-[node name="TextLabel" type="Label" parent="HSplit/LetterPanel/LetterVBox/Slots/SignatureSlot"]
+[node name="TextLabel" type="Label" parent="HSplit/LetterPanel/LetterVBox/Slots/SignatureSlot" unique_id=969829225]
 layout_mode = 0
 offset_right = 112.0
 offset_bottom = 23.0
 text = "拖拽落款到此处"
 
-[node name="ButtonBar" type="HBoxContainer" parent="."]
+[node name="ButtonBar" type="HBoxContainer" parent="." unique_id=1421435204]
 layout_mode = 1
 anchors_preset = 12
 anchor_top = 1.0
@@ -217,24 +219,24 @@ grow_horizontal = 2
 grow_vertical = 0
 theme_override_constants/separation = 8
 
-[node name="SubmitBtn" type="Button" parent="ButtonBar"]
+[node name="SubmitBtn" type="Button" parent="ButtonBar" unique_id=2001005266]
 layout_mode = 2
 text = "提交"
 
-[node name="ResetBtn" type="Button" parent="ButtonBar"]
+[node name="ResetBtn" type="Button" parent="ButtonBar" unique_id=1598711313]
 layout_mode = 2
 text = "重新填写"
 
-[node name="BackBtn" type="Button" parent="ButtonBar"]
+[node name="BackBtn" type="Button" parent="ButtonBar" unique_id=1111504484]
 layout_mode = 2
 text = "返回主界面"
 
-[node name="ResultPopup" type="AcceptDialog" parent="."]
+[node name="ResultPopup" type="AcceptDialog" parent="." unique_id=1110684998]
 title = "结算结果"
 size = Vector2i(380, 220)
 min_size = Vector2i(320, 160)
 
-[node name="ResultLabel" type="RichTextLabel" parent="ResultPopup"]
+[node name="ResultLabel" type="RichTextLabel" parent="ResultPopup" unique_id=437336627]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -244,6 +246,5 @@ offset_right = -8.0
 offset_bottom = -49.0
 grow_horizontal = 2
 grow_vertical = 2
-text = "（结算结果）"
-autowrap_mode = 3
 bbcode_enabled = true
+text = "（结算结果）"

@@ -1,0 +1,50 @@
+{
+  "meta": {
+    "round": "r1",
+    "model": "Anything XL",
+    "resolution": "832x832",
+    "steps": 28,
+    "cfg": 7.0,
+    "seed": -1,
+    "note": "8GB显存基线，建议启用CPU offload"
+  },
+  "negative_prompt": "lowres, blurry, text, watermark, logo, signature, jpeg artifacts, bad anatomy, deformed, extra fingers, cropped, worst quality",
+  "groups": [
+    {
+      "id": "cursor",
+      "output_dir": "assets/images/generated/cursor",
+      "file_prefix": "cursor_r1_",
+      "prompts": [
+        "single Chinese calligraphy brush stroke cursor icon, black ink, dry brush texture, minimal, high contrast, isolated, transparent background style",
+        "ink brush tip mark, dynamic stroke, Chinese painting style, monochrome black, clean silhouette, isolated object, transparent background style",
+        "small calligraphy brushstroke symbol, sharp edge, subtle ink diffusion, minimal UI asset style, black on transparent background style",
+        "flying ink stroke shape, elegant Chinese brush line, game cursor asset, high contrast black ink, isolated",
+        "brush cursor frame, handcrafted ink stroke, slight variation angle, anime game UI asset, isolated black ink mark"
+      ]
+    },
+    {
+      "id": "paper",
+      "output_dir": "assets/images/generated/paper",
+      "file_prefix": "paper_r1_",
+      "prompts": [
+        "ancient Chinese rice paper texture, warm beige, subtle fiber grain, soft stains, high detail, seamless texture style",
+        "old letter paper background, handmade xuan paper fibers, light yellow tone, gentle aging marks, no text, no border",
+        "vintage Chinese stationery paper, soft ink bleed traces, natural fiber pattern, flat top view, texture scan style",
+        "clean parchment for calligraphy, mild wrinkles, warm off-white, balanced grain noise, game background texture",
+        "traditional East Asian writing paper texture, subtle worn corners, paper fibers, neutral lighting, high resolution"
+      ]
+    },
+    {
+      "id": "calligraphy",
+      "output_dir": "assets/images/generated/calligraphy",
+      "file_prefix": "calligraphy_r1_",
+      "prompts": [
+        "Chinese calligraphy character on plain background, bold black ink, clear brush rhythm, high contrast, centered composition",
+        "handwritten Chinese ink character, elegant stroke order feel, xuan paper background, minimal composition, no seal",
+        "traditional brush script Chinese glyph, sharp and flowing strokes, monochrome ink, isolated character",
+        "calligraphy style Chinese word, clean spacing, black ink texture, legible strokes, high resolution",
+        "ink calligraphy symbol set style, single character focus, subtle dry brush effect, centered, no decoration"
+      ]
+    }
+  ]
+}

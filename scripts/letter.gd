@@ -1,7 +1,7 @@
 extends Control
 
 # 左侧词库
-@onready var request_label: Label = $HSplit/WordPanel/WordVBox/RequestLabel
+@onready var request_label: Label = $HSplit/LetterPanel/LetterVBox/RequestLabel
 @onready var salutation_container: VBoxContainer = $HSplit/WordPanel/WordVBox/SalutationContainer
 @onready var body_container: VBoxContainer = $HSplit/WordPanel/WordVBox/BodyContainer
 @onready var signature_container: VBoxContainer = $HSplit/WordPanel/WordVBox/SignatureContainer
@@ -54,6 +54,13 @@ func _ready() -> void:
 
 	# 信纸区域使用毛笔字体（若存在 maobi.ttf）
 	_apply_letter_font()
+	# 口述文本用系统小字，便于横向阅读
+	request_label.remove_theme_font_override("font")
+	request_label.remove_theme_font_size_override("font_size")
+	request_label.remove_theme_color_override("font_color")
+	request_label.remove_theme_constant_override("outline_size")
+	request_label.remove_theme_color_override("font_outline_color")
+	request_label.add_theme_font_size_override("font_size", 14)
 
 # 为右侧信纸区域所有 Label 应用毛笔字体与墨色
 func _apply_letter_font() -> void:
@@ -115,9 +122,15 @@ func _build_word_pools() -> void:
 	for text in word_pool.get("salutation", []):
 		_add_word_button(salutation_container, str(text), "salutation", "")
 
-	# 正文词库（body_slots.slot1/2/3）
+	# 正文词库（body_slots.slot1/2/3），每行加标签对应右侧槽位
 	var body_slots: Dictionary = word_pool.get("body_slots", {})
+	var slot_labels := {"slot1": "家中", "slot2": "在外", "slot3": "盼"}
 	for slot_name in ["slot1", "slot2", "slot3"]:
+		var label := Label.new()
+		label.text = "· " + slot_labels.get(slot_name, slot_name)
+		label.add_theme_font_size_override("font_size", 12)
+		label.add_theme_color_override("font_color", Color(0.4, 0.4, 0.4))
+		body_container.add_child(label)
 		var row := HBoxContainer.new()
 		body_container.add_child(row)
 		for text in body_slots.get(slot_name, []):

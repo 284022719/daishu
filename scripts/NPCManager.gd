@@ -32,7 +32,7 @@ const FEEDBACK_PERFECT = ["先生写得真好！", "正是我想说的！", "太
 const FEEDBACK_NORMAL = ["还行吧", "就这样", "可以了"]
 const FEEDBACK_WRONG = ["不对不对", "这写的啥？", "重写！"]
 
-func generate_random_npc() -> Dictionary:
+func generate_random_npc(day: int = 1) -> Dictionary:
 	var npc_id: int = -int(Time.get_unix_time_from_system() + randi() % 10000)
 
 	var first: String = FIRST_NAMES[randi() % FIRST_NAMES.size()]
@@ -81,6 +81,10 @@ func generate_random_npc() -> Dictionary:
 		"wrong": FEEDBACK_WRONG[randi() % FEEDBACK_WRONG.size()]
 	}
 
+	# 随天数递增奖励：后期 NPC 更"大方"，给玩家追赶机制
+	var scaled_bonus: int = 8 + (day - 1)
+	var scaled_base: int = 12 + int((day - 1) / 3)
+
 	return {
 		"npc_id": npc_id,
 		"name": npc_name,
@@ -96,15 +100,15 @@ func generate_random_npc() -> Dictionary:
 			"signature": correct_signature
 		},
 		"word_pool": word_pool,
-		"base_fee": 12,
-		"perfect_bonus": 8,
+		"base_fee": scaled_base,
+		"perfect_bonus": scaled_bonus,
 		"feedback": feedback
 	}
 
-func get_today_npcs(_day: int) -> Array:
+func get_today_npcs(day: int) -> Array:
 	var result: Array = []
 	for i in range(3):
-		result.append(generate_random_npc())
+		result.append(generate_random_npc(day))
 	current_day_npcs = result
 	return result
 
