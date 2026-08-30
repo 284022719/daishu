@@ -1,6 +1,7 @@
 extends Node
 
 const RESULT_PERFECT := "PERFECT"
+const RESULT_GOOD := "GOOD"
 const RESULT_NORMAL := "NORMAL"
 const RESULT_WRONG := "WRONG"
 
@@ -63,14 +64,20 @@ func judge(npc: Dictionary, answers: Dictionary) -> Dictionary:
 		result_code = RESULT_WRONG
 		fee = -2 * format_errors
 		feedback_text = str(feedback.get("wrong", ""))
-	elif content_mismatch > 0:
-		result_code = RESULT_NORMAL
-		fee = base_fee
-		feedback_text = str(feedback.get("normal", ""))
 	elif correct_count == 5:
 		result_code = RESULT_PERFECT
 		fee = base_fee + perfect_bonus
 		feedback_text = str(feedback.get("perfect", ""))
+	elif correct_count == 4:
+		# 阶梯：4/5 正确给 70% bonus，平滑"全有或全无"的技能悬崖
+		result_code = RESULT_GOOD
+		fee = base_fee + int(perfect_bonus * 0.7)
+		feedback_text = str(feedback.get("good", feedback.get("normal", "")))
+	else:
+		# 内容错误（错词）：按 60% 底薪计费，让乱填有真实代价
+		result_code = RESULT_NORMAL
+		fee = int(base_fee * 0.6)
+		feedback_text = str(feedback.get("normal", ""))
 	
 	# 每项是否正确，以及正确答案（供界面高亮用）
 	var correct_answers: Dictionary = {

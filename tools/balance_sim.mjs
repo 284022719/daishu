@@ -35,6 +35,7 @@ function genAnswersRandom() {
 }
 
 // JudgeSystem.judge 计费移植 (cfg.baseAdd/bonusMul 用于灵敏度扫描)
+// 与 scripts/JudgeSystem.gd 保持同步: 5/5=base+bonus, 4/5=base+0.7*bonus, <=3/5=0.6*base, 空槽=-2/个
 function judgeFee(answers, day, cfg) {
   let format = 0, correct = 0;
   for (const s of Object.keys(answers)) {
@@ -43,9 +44,11 @@ function judgeFee(answers, day, cfg) {
     if (v === 'correct') correct++;
   }
   const base = baseFee(day) + (cfg.baseAdd ?? 0);
+  const bonus = perfectBonus(day) * (cfg.bonusMul ?? 1);
   if (format > 0) return -2 * format;
-  if (correct === 5) return base + perfectBonus(day) * (cfg.bonusMul ?? 1);
-  return base;
+  if (correct === 5) return base + bonus;
+  if (correct === 4) return base + Math.floor(bonus * 0.7);
+  return Math.floor(base * 0.6);
 }
 
 // 单局模拟
