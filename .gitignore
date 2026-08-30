@@ -1,4 +1,3 @@
 godot-mcp/
 .claude/mcp.json
-.godot/imported/
-.godot/shader_cache/
+.godot/
