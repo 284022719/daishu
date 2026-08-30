@@ -98,7 +98,7 @@ func _on_end_day_pressed():
 	var summary: Dictionary = PlayerManager.get_day_summary()
 	var income := int(summary.get("income", 0))
 	var expense := int(summary.get("expense", 0))
-	var stall_fee := int(summary.get("stall_fee", 23))
+	var stall_fee := int(summary.get("stall_fee", PlayerManager.STALL_FEE_PER_DAY))
 	var net := int(summary.get("net", 0))
 	var lines := "第 %d 日结算\n\n" % PlayerManager.day
 	lines += "今日收入：%d 文\n" % income
