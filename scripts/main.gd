@@ -66,7 +66,7 @@ func _on_start_day_pressed():
 		if npc_id != null and PlayerManager.is_npc_completed(int(npc_id)):
 			continue
 		var btn = Button.new()
-		btn.text = npc["name"]
+		btn.text = "%s（%s）" % [npc["name"], npc.get("letter_type", "家书")]
 		# 将NPC的id存储在按钮的meta中，便于点击时获取
 		btn.set_meta("npc_id", npc["npc_id"])
 		btn.pressed.connect(_on_npc_button_pressed.bind(btn))

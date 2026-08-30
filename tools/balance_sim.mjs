@@ -5,7 +5,7 @@
 //   scripts/JudgeSystem.gd  — 三档判定与计费
 //   scripts/PlayerManager.gd— 起始金钱/摊位费/结局规则
 
-const POOL = { salutation: 2, body: 4, signature: 2 }; // 各槽位词库大小
+const POOL = { salutation: 3, body: 6, signature: 3 }; // 各槽位词库大小(阶段1扩充后)
 
 function baseFee(day) { return 12 + Math.floor((day - 1) / 3); }
 function perfectBonus(day) { return 8 + (day - 1); }
