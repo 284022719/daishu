@@ -1,0 +1,94 @@
+{
+  "meta": {
+    "round": 2,
+    "date": "2026-08-30",
+    "purpose": "正式版美术素材：替换带水印的占位图 + 补齐缺失资产",
+    "style_anchor": "16-bit low-saturation pixel art, Ming dynasty (成化年间) Chinese street life, warm rice-paper palette (#fce4b4 paper, #9c5424 wood, #3c3c2c ink), dithering, clean readable shapes, NO text, NO watermark, NO signature, NO letters/chars"
+  },
+  "negative_prompt": "text, letters, characters, watermark, signature, logo, brand, copyright, photorealistic, 3d render, smooth gradients, modern style, anime, high saturation, blurry, noise, grid lines not aligned",
+  "groups": [
+    {
+      "name": "title_bg",
+      "usage": "标题界面背景",
+      "size": "1152x648 (出图 2304x1296 后缩)",
+      "prompts": [
+        "16-bit pixel art, morning street in a Ming dynasty town, a poor scholar with a small writing stall in the foreground, distant city gate and roofs, warm rice-paper sky, muted earth tones, composition leaves the center empty for a title, NO text",
+        "pixel art, Ming dynasty riverside market at dawn, wooden stalls, a young scholar holding a letter, warm beige and brown palette, empty sky area at top for UI, no text no watermark"
+      ]
+    },
+    {
+      "name": "main_bg",
+      "usage": "主界面背景（词库/信纸操作区背景）",
+      "size": "1152x648",
+      "prompts": [
+        "16-bit pixel art, interior of a Ming dynasty letter-writing shop, wooden counter, paper sheets and brushes on the desk, warm brown wood (#9c5424) and rice-paper tones, front view, flat uncluttered background suitable for UI panels, no text",
+        "pixel art, Ming dynasty street stall with writing brushes and ink stones, warm earthy palette, clean simple composition, UI-friendly dark-ish background, no text no watermark"
+      ]
+    },
+    {
+      "name": "letter_paper",
+      "usage": "信纸书写底图（关键：必须 12 栏竖线，可像素测量）",
+      "size": "约 2364x1773 横版 或 1152x648 等比",
+      "prompts": [
+        "pixel art rice paper texture, horizontal letter sheet, EXACTLY 12 vertical columns separated by thin brown column guide lines, evenly spaced, warm beige paper (#fce4b4), slightly aged edges, no horizontal lines, no text, no watermark, column lines must be clean continuous 1-2px lines",
+        "ancient Chinese letter paper, horizontal, 12 evenly spaced vertical red-brown column rules, plain rice-paper background, aged paper texture, pixel art style, no characters no watermark"
+      ],
+      "note": "生成后必须跑网格线像素检测（sharp），栏位分数表用于更新 letter.tscn 锚点。若 12 栏不稳定，接受 10/14 栏并在锚点表中记录。"
+    },
+    {
+      "name": "word_panel",
+      "usage": "左侧词库区底板（现为透明）",
+      "size": "355x600",
+      "prompts": [
+        "pixel art wooden signboard panel, Ming dynasty, warm brown wood with subtle grain, slightly rounded corners, 9-slice friendly, empty flat surface, no text, no watermark",
+        "pixel art bamboo slip panel background, warm tan, plain flat surface for UI buttons, no text"
+      ]
+    },
+    {
+      "name": "npc_avatar",
+      "usage": "NPC 头像（主界面列表/结算）",
+      "size": "48x48 或 64x64，统一风格",
+      "prompts": [
+        "16-bit pixel art portrait, middle-aged Ming dynasty farmer with straw hat, warm earthy palette, 64x64, bust, plain background",
+        "16-bit pixel art portrait, old Ming dynasty woman, headscarf, kind expression, 64x64, bust, plain background",
+        "16-bit pixel art portrait, young Ming dynasty scholar with a bun, thin face, 64x64, bust, plain background",
+        "16-bit pixel art portrait, Ming dynasty street vendor with a carrying pole, 64x64, bust, plain background",
+        "16-bit pixel art portrait, Ming dynasty child, round face, 64x64, bust, plain background",
+        "16-bit pixel art portrait, middle-aged Ming dynasty merchant, robes, 64x64, bust, plain background"
+      ]
+    },
+    {
+      "name": "ending_bg",
+      "usage": "成功/失败结局背景",
+      "size": "1152x648 ×2",
+      "prompts": [
+        "16-bit pixel art, success ending: triumphant scholar at the imperial examination gate under warm golden light, festive banners, warm palette, no text no watermark",
+        "16-bit pixel art, failure ending: dejected scholar leaving town at dusk, rainy grey-blue tones with warm lantern accents, melancholic but warm, no text no watermark"
+      ]
+    },
+    {
+      "name": "prologue_bg",
+      "usage": "序章剧情背景（可选）",
+      "size": "1152x648",
+      "prompts": [
+        "16-bit pixel art, night study scene, candlelight on a desk with brushes and a letter, warm glow, cozy poverty, no text no watermark"
+      ]
+    },
+    {
+      "name": "cursor_brush",
+      "usage": "毛笔光标（round1 已有 5 张，此组为备选帧）",
+      "size": "16-24px 帧",
+      "prompts": [
+        "pixel art calligraphy brush cursor, ink tip, 16x16, simple silhouette, visible on beige background, no text"
+      ]
+    },
+    {
+      "name": "button_9slice",
+      "usage": "按钮九宫格底板",
+      "size": "32x32（9-slice）",
+      "prompts": [
+        "pixel art UI button, Ming dynasty wood-bordered paper panel, 9-slice style, warm beige center with brown border, flat, no text no icon"
+      ]
+    }
+  ]
+}
