@@ -111,34 +111,54 @@ theme_override_constants/separation = 12
 layout_mode = 2
 text = "（口述内容）"
 
-[node name="Slots" type="HBoxContainer" parent="HSplit/LetterPanel/LetterVBox" unique_id=98025117]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-theme_override_constants/separation = 40
+[node name="PaperArea" type="Control" parent="." unique_id=98025117]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 390.0
+offset_top = -65.0
+offset_right = -21.0
+offset_bottom = 13.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
 
-[node name="SalutationSlot" type="Panel" parent="HSplit/LetterPanel/LetterVBox/Slots" unique_id=1281543972]
-custom_minimum_size = Vector2(40, 260)
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
+[node name="SalutationSlot" type="Panel" parent="PaperArea" unique_id=1281543972]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.7253
+anchor_top = 0.12
+anchor_right = 0.7980
+anchor_bottom = 0.85
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxEmpty_antxc")
 script = ExtResource("3")
 slot_key = "salutation"
 expected_category = "salutation"
 placeholder = "拖拽称谓到此处"
 
-[node name="TextLabel" type="Label" parent="HSplit/LetterPanel/LetterVBox/Slots/SalutationSlot" unique_id=880520190]
-layout_mode = 0
-offset_right = 112.0
-offset_bottom = 23.0
+[node name="TextLabel" type="Label" parent="PaperArea/SalutationSlot" unique_id=880520190]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 text = "拖拽称谓到此处"
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="BodySlot1" type="Panel" parent="HSplit/LetterPanel/LetterVBox/Slots" unique_id=2051957997]
-custom_minimum_size = Vector2(40, 260)
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
+[node name="BodySlot1" type="Panel" parent="PaperArea" unique_id=2051957997]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5759
+anchor_top = 0.12
+anchor_right = 0.7253
+anchor_bottom = 0.85
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_styles/panel = SubResource("4_transparent")
 script = ExtResource("3")
 slot_key = "body_slot1"
@@ -146,17 +166,26 @@ expected_category = "body"
 body_slot = "slot1"
 placeholder = "家中 ______"
 
-[node name="TextLabel" type="Label" parent="HSplit/LetterPanel/LetterVBox/Slots/BodySlot1" unique_id=470724345]
-layout_mode = 0
-offset_right = 78.0
-offset_bottom = 23.0
+[node name="TextLabel" type="Label" parent="PaperArea/BodySlot1" unique_id=470724345]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 text = "家中 ______"
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="BodySlot2" type="Panel" parent="HSplit/LetterPanel/LetterVBox/Slots" unique_id=730639774]
-custom_minimum_size = Vector2(40, 260)
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
+[node name="BodySlot2" type="Panel" parent="PaperArea" unique_id=730639774]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.4304
+anchor_top = 0.12
+anchor_right = 0.5759
+anchor_bottom = 0.85
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_styles/panel = SubResource("4_transparent")
 script = ExtResource("3")
 slot_key = "body_slot2"
@@ -164,17 +193,26 @@ expected_category = "body"
 body_slot = "slot2"
 placeholder = "在外 ______"
 
-[node name="TextLabel" type="Label" parent="HSplit/LetterPanel/LetterVBox/Slots/BodySlot2" unique_id=105316967]
-layout_mode = 0
-offset_right = 78.0
-offset_bottom = 23.0
+[node name="TextLabel" type="Label" parent="PaperArea/BodySlot2" unique_id=105316967]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 text = "在外 ______"
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="BodySlot3" type="Panel" parent="HSplit/LetterPanel/LetterVBox/Slots" unique_id=440605257]
-custom_minimum_size = Vector2(40, 260)
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
+[node name="BodySlot3" type="Panel" parent="PaperArea" unique_id=440605257]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.2809
+anchor_top = 0.12
+anchor_right = 0.4304
+anchor_bottom = 0.85
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_styles/panel = SubResource("4_transparent")
 script = ExtResource("3")
 slot_key = "body_slot3"
@@ -182,28 +220,42 @@ expected_category = "body"
 body_slot = "slot3"
 placeholder = "盼 ______"
 
-[node name="TextLabel" type="Label" parent="HSplit/LetterPanel/LetterVBox/Slots/BodySlot3" unique_id=503473708]
-layout_mode = 0
-offset_right = 62.0
-offset_bottom = 23.0
+[node name="TextLabel" type="Label" parent="PaperArea/BodySlot3" unique_id=503473708]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 text = "盼 ______"
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="SignatureSlot" type="Panel" parent="HSplit/LetterPanel/LetterVBox/Slots" unique_id=1836985505]
-custom_minimum_size = Vector2(40, 260)
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
+[node name="SignatureSlot" type="Panel" parent="PaperArea" unique_id=1836985505]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.1335
+anchor_top = 0.12
+anchor_right = 0.2809
+anchor_bottom = 0.85
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_styles/panel = SubResource("4_transparent")
 script = ExtResource("3")
 slot_key = "signature"
 expected_category = "signature"
 placeholder = "拖拽落款到此处"
 
-[node name="TextLabel" type="Label" parent="HSplit/LetterPanel/LetterVBox/Slots/SignatureSlot" unique_id=969829225]
-layout_mode = 0
-offset_right = 112.0
-offset_bottom = 23.0
+[node name="TextLabel" type="Label" parent="PaperArea/SignatureSlot" unique_id=969829225]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 text = "拖拽落款到此处"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="ButtonBar" type="HBoxContainer" parent="." unique_id=1421435204]
 layout_mode = 1

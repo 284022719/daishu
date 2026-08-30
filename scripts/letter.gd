@@ -6,12 +6,12 @@ extends Control
 @onready var body_container: VBoxContainer = $HSplit/WordPanel/WordVBox/BodyContainer
 @onready var signature_container: VBoxContainer = $HSplit/WordPanel/WordVBox/SignatureContainer
 
-# 右侧信纸槽位
-@onready var salutation_slot = $HSplit/LetterPanel/LetterVBox/Slots/SalutationSlot
-@onready var body_slot1 = $HSplit/LetterPanel/LetterVBox/Slots/BodySlot1
-@onready var body_slot2 = $HSplit/LetterPanel/LetterVBox/Slots/BodySlot2
-@onready var body_slot3 = $HSplit/LetterPanel/LetterVBox/Slots/BodySlot3
-@onready var signature_slot = $HSplit/LetterPanel/LetterVBox/Slots/SignatureSlot
+# 右侧信纸槽位（锚定在底纸栏位上）
+@onready var salutation_slot = $PaperArea/SalutationSlot
+@onready var body_slot1 = $PaperArea/BodySlot1
+@onready var body_slot2 = $PaperArea/BodySlot2
+@onready var body_slot3 = $PaperArea/BodySlot3
+@onready var signature_slot = $PaperArea/SignatureSlot
 
 # 底部按钮与结算弹窗
 @onready var submit_btn: Button = $ButtonBar/SubmitBtn
@@ -69,8 +69,7 @@ func _apply_letter_font() -> void:
 	var font: Font = load(LETTER_FONT_PATH) as Font
 	if font == null:
 		return
-	var letter_vbox: VBoxContainer = $HSplit/LetterPanel/LetterVBox
-	_apply_font_to_labels(letter_vbox, font)
+	_apply_font_to_labels($PaperArea, font)
 
 func _apply_font_to_labels(control: Control, font: Font) -> void:
 	if control is Label:
