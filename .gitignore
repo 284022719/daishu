@@ -1,3 +1,9 @@
 godot-mcp/
 .claude/mcp.json
 .godot/
+
+# Godot 导出产物（构建输出，不进版本控制）
+export/
+*.pck
+*.exe
+*.x86_64
