@@ -70,9 +70,10 @@ assets/
   fonts/          # Calligraphy font: hanchanlongcang.otf (+ 寒蝉字体授权说明.txt)
   images/
     backgrounds/  # Scene backgrounds (main.png, letter.png, main_bg.png)
-    generated/    # AI-art staging dirs: cursor/, paper/, calligraphy/
-                  # ⚠️ round-1 outputs were deleted in 196001c (unreferenced-asset
-                  # cleanup); only .gitkeep remains. Prompts live in data/art_prompts_round*.json.
+    generated/    # AI-art staging dirs: cursor/, paper/, calligraphy/ (now only .gitkeep)
+                  # round-1 outputs were moved OUT of the repo in 196001c and are ARCHIVED
+                  # at D:\daishu_asset_archive\ (15 files, 832x832, all re-checked
+                  # watermark-free). Not lost — see docs/ART_PLAN.md §八. Don't regenerate.
 data/             # Game data files (incl. art_prompts_round1/2.json — AI art prompts)
 docs/             # Design docs (readme.md is the canonical overview)
 addons/           # Godot plugins (may be empty)
@@ -105,4 +106,15 @@ node tools/art_check.mjs watermark <img> --crop --out <out.png>  # 水印区排�
 ```
 
 Hard rule (ART_PLAN §一): **no text, watermark or brand mark in any shipped asset.** Any asset with a measurable grid must be anchored from `grid` output, never by eye.
+
+## AI playbook (versioned)
+
+Project-tailored AI knowledge — the Godot-docs retrieval recipe, the project doc map, and the host-specific pitfalls — lives in `docs/AI_PLAYBOOK.md`. That file is the **source of truth** (git-tracked). DSH reads it as the `godot-docs` skill from `~/.dsh/skills/godot-docs/SKILL.md`, which is a **mirror living outside any git repository** (a machine reinstall would lose it, hence the direction of sync).
+
+After editing the playbook, re-mirror it — the script normalizes to UTF-8 without BOM and LF (`.gitattributes` enforces `* text=auto eol=lf`), byte-verifies the write and rolls back on failure:
+
+```powershell
+pwsh -File tools/sync-ai-playbook.ps1          # source → skill dir
+pwsh -File tools/sync-ai-playbook.ps1 -Check   # drift check, exit 1 when out of sync
+```
 
