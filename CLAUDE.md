@@ -67,16 +67,42 @@ title_screen → prologue → main → letter (instantiated on top of main) → 
 scripts/          # All .gd scripts (autoloads + scene scripts + UI helpers)
 scenes/           # All .tscn scene files
 assets/
-  fonts/          # Calligraphy fonts (hanchanlongcang.otf, maobi.ttf, etc.)
+  fonts/          # Calligraphy font: hanchanlongcang.otf (+ 寒蝉字体授权说明.txt)
   images/
-    backgrounds/  # Scene backgrounds (main.png, letter.png, etc.)
-    generated/    # AI-generated art: cursor/, paper/, calligraphy/
-data/             # Game data files
+    backgrounds/  # Scene backgrounds (main.png, letter.png, main_bg.png)
+    generated/    # AI-art staging dirs: cursor/, paper/, calligraphy/
+                  # ⚠️ round-1 outputs were deleted in 196001c (unreferenced-asset
+                  # cleanup); only .gitkeep remains. Prompts live in data/art_prompts_round*.json.
+data/             # Game data files (incl. art_prompts_round1/2.json — AI art prompts)
 docs/             # Design docs (readme.md is the canonical overview)
 addons/           # Godot plugins (may be empty)
-godot-mcp/        # Godot MCP server for Cursor integration (git clone'd dependency)
+godot-mcp/        # Godot MCP server, git-clone'd dependency (gitignored)
 ```
 
 ## MCP setup
 
-Claude Code MCP config at `.claude/mcp.json` references `godot-mcp/build/index.js`. To set up: `cd godot-mcp && npm install && npm run build`. This enables AI-assisted Godot editor operations — not part of the game itself.
+`godot-mcp/` is a git-clone'd dependency and `.claude/mcp.json` is gitignored, so a fresh clone has **no** MCP wiring. Reproduce it in one command:
+
+```powershell
+pwsh -File tools/setup-godot-mcp.ps1
+```
+
+It clones (must use **SSH** — HTTPS to github.com is blocked on this machine), builds, and writes `.claude/mcp.json`. Two hard requirements: `GODOT_PATH` must point at `*_console.exe` (the non-console exe emits 0 bytes on redirected stdout, which silently breaks `run_project` / `get_debug_output`), and the server exposes **14 tools** named `mcp__godot__*`.
+
+The DSH web harness is wired separately (not via `.claude/mcp.json`) in `~/.dsh/profiles/web/cordis.patch.yml` as the `mcp-godot` entry. That file is hot-watched — saving it re-composes the profile without restarting DSH. This enables AI-assisted Godot editor operations — not part of the game itself.
+
+## AI-assisted art pipeline
+
+Art is generated outside the engine from prompts in `data/art_prompts_round1.json` (Anything XL, 832×832, steps 28, cfg 7) and `data/art_prompts_round2.json` (pixel-art direction, negative prompt, palette anchors). `docs/ART_PLAN.md` is the plan of record.
+
+`tools/art_check.mjs` is the asset checker — **zero dependencies** (node built-in `zlib` only, ships its own PNG decode/encode, so no `npm install`):
+
+```bash
+node tools/art_check.mjs info      assets/images/backgrounds/letter.png
+node tools/art_check.mjs palette   <img>            # 色板量化 + 与 ART_PLAN 锚点色对比
+node tools/art_check.mjs grid      <img> --expect 12 # 竖线像素检测 → 栏位分数表（信纸锚定用）
+node tools/art_check.mjs watermark <img> --crop --out <out.png>  # 水印区排查 / 裁除
+```
+
+Hard rule (ART_PLAN §一): **no text, watermark or brand mark in any shipped asset.** Any asset with a measurable grid must be anchored from `grid` output, never by eye.
+
