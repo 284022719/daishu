@@ -66,26 +66,37 @@ const STORY_TEMPLATES = {
 		"久未给{relation}去信，家中{slot1}，只愿{slot2}，还望{slot3}。"
 	],
 	"请安": [
-		"给{relation}请安：近来{slot1}否？在外{slot2}，只盼{slot3}。",
+		"给{relation}请安：近来{slot1}否？望{relation}{slot2}，只盼{slot3}。",
 		"{name}给{relation}问安：家中{slot1}，望{relation}{slot2}，得闲{slot3}。",
 		"许久未见{relation}，特修书请安：{slot1}，{slot2}，{slot3}。"
 	],
 	"贺寿": [
 		"欣逢{relation}寿辰，{name}特来贺寿：愿{slot1}，{slot2}，{slot3}。",
-		"给{relation}拜寿：福如{slot1}，寿比{slot2}，{slot3}。",
+		"恭祝{relation}寿辰：愿{slot1}，更愿{slot2}，他日{slot3}。",
 		"贺{relation}华诞：{slot1}，{slot2}，{slot3}。"
 	],
 	"诉苦": [
-		"家中{slot1}，{name}在外{slot2}，恳请{relation}{slot3}。",
+		"家中{slot1}，{name}在外求告无门，恳请{relation}{slot2}，{slot3}。",
 		"近来{slot1}，{name}困顿，望{relation}{slot2}，{slot3}。",
 		"向{relation}诉苦：{slot1}，{slot2}，盼{slot3}。"
 	],
 	"求荐": [
-		"欲赴科考，苦无门路，恳请{relation}{slot3}，{name}有{slot1}之志，{slot2}之望。",
+		"欲赴科考，苦无门路。{name}有{slot1}之志，{slot2}之望，恳请{relation}{slot3}。",
 		"{name}求{relation}荐举：{slot1}，{slot2}，{slot3}。",
-		"今有{slot1}之才，望{relation}{slot2}，{slot3}。"
+		"今有{slot1}，望{relation}{slot2}，{slot3}。"
 	]
 }
+
+# 正文三槽的界面提示词（按信型）：letter.gd 据此生成词库标签与信纸槽位占位符
+const SLOT_HINTS = {
+	"家书": {"slot1": "家中", "slot2": "在外", "slot3": "盼"},
+	"请安": {"slot1": "近况", "slot2": "珍重", "slot3": "盼音"},
+	"贺寿": {"slot1": "福寿", "slot2": "纳福", "slot3": "欢聚"},
+	"诉苦": {"slot1": "处境", "slot2": "求援", "slot3": "盼助"},
+	"求荐": {"slot1": "才学", "slot2": "引荐", "slot3": "成全"}
+}
+
+const DEFAULT_SLOT_HINTS = {"slot1": "其一", "slot2": "其二", "slot3": "其三"}
 
 const FEEDBACK_PERFECT = ["先生写得真好！", "正是我想说的！", "太感谢了！", "妙极，正是此意！"]
 const FEEDBACK_GOOD = ["不错，再仔细些就更好了", "大体妥当", "尚可，有几处不妥"]
@@ -142,7 +153,7 @@ func generate_random_npc(day: int = 1) -> Dictionary:
 
 	# 随天数递增奖励：后期 NPC 更"大方"，给玩家追赶机制
 	var scaled_bonus: int = 8 + (day - 1)
-	var scaled_base: int = 12 + int((day - 1) / 3)
+	var scaled_base: int = 12 + floori((day - 1) / 3.0)
 
 	var description: String = "一位想给%s写信的%s" % [relation, letter_type]
 
@@ -172,6 +183,9 @@ func get_today_npcs(day: int) -> Array:
 		result.append(generate_random_npc(day))
 	current_day_npcs = result
 	return result
+
+func get_slot_hints(letter_type: String) -> Dictionary:
+	return SLOT_HINTS.get(letter_type, DEFAULT_SLOT_HINTS)
 
 func get_npc_by_id(npc_id: int) -> Dictionary:
 	var id_int := int(npc_id)

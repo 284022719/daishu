@@ -31,6 +31,8 @@ var current_npc: Dictionary = {}
 var current_npc_id: int = 0
 var _npc_initialized := false
 var _pending_result: Dictionary = {}
+# 正文三槽界面提示词，随信型变化（由 NPCManager.get_slot_hints 提供）
+var _slot_hints: Dictionary = {"slot1": "其一", "slot2": "其二", "slot3": "其三"}
 
 # 当前填写的答案（与判定系统兼容）
 var player_answers := {
@@ -105,9 +107,21 @@ func init_with_npc(npc_id: int) -> void:
 
 	request_label.text = str(current_npc.get("request_text", ""))
 
+	_slot_hints = npc_manager.get_slot_hints(str(current_npc.get("letter_type", "")))
+	_apply_slot_placeholders()
 	_build_word_pools()
 	reset_answers()
 	_npc_initialized = true
+
+# 信纸槽位占位符随信型变化：避免 5 种信型共用家书语义（家中/在外/盼）造成误导
+func _apply_slot_placeholders() -> void:
+	var slots := {"slot1": body_slot1, "slot2": body_slot2, "slot3": body_slot3}
+	for slot_name in slots.keys():
+		var slot = slots[slot_name]
+		if slot == null:
+			continue
+		slot.placeholder = "%s ______" % str(_slot_hints.get(slot_name, slot_name))
+		slot.clear_slot()
 
 func _build_word_pools() -> void:
 	# 清空旧的词库按钮
@@ -123,7 +137,7 @@ func _build_word_pools() -> void:
 
 	# 正文词库（body_slots.slot1/2/3），每行加标签对应右侧槽位
 	var body_slots: Dictionary = word_pool.get("body_slots", {})
-	var slot_labels := {"slot1": "家中", "slot2": "在外", "slot3": "盼"}
+	var slot_labels: Dictionary = _slot_hints
 	for slot_name in ["slot1", "slot2", "slot3"]:
 		var label := Label.new()
 		label.text = "· " + slot_labels.get(slot_name, slot_name)
