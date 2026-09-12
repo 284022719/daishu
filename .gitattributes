@@ -1,2 +1,6 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+# 统一行尾：Git 认定为文本的文件，索引与检出都使用 LF。
+# eol=lf 会覆盖 core.autocrlf=true（本机全局为 true），否则每次 git 操作都会刷
+# "LF will be replaced by CRLF" 警告，且不同工具写出的文件行尾会互相打架。
+# 写法与 Godot 官方文档一致（tutorials/best_practices/version_control_systems.rst:136）。
+# text=auto 保留二进制自动识别，字体 / PNG 不受影响。
+* text=auto eol=lf
