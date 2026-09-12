@@ -1,4 +1,4 @@
-📚 代书项目综合文档（截至2026年3月4日）
+📚 代书项目综合文档（截至2026年9月12日）
 本文档汇总了当前项目的核心设计、系统架构、数据格式、场景结构及后续计划，旨在为新参与开发者（或未来的你）提供一份清晰完整的项目蓝图。
 
 一、项目简介
@@ -53,7 +53,7 @@ get_today_npcs(day)：返回当日3个NPC，奖励随天数递增
 get_npc_by_id(id)：在当日列表中查找NPC
 
 JudgeSystem
-常量：RESULT_PERFECT, RESULT_NORMAL, RESULT_WRONG
+常量：RESULT_PERFECT, RESULT_GOOD, RESULT_NORMAL, RESULT_WRONG
 
 核心方法：
 
@@ -95,9 +95,9 @@ correct：正确答案（称谓、正文三空、落款）
 
 word_pool：词库（称谓、正文三槽候选、落款）
 
-base_fee / perfect_bonus：报酬（当前12文/8文）
+base_fee / perfect_bonus：报酬（基准 12 文 / 8 文，随天数递增）
 
-feedback：三种结果的反馈文本
+feedback：四种结果的反馈文本（perfect / good / normal / wrong）
 
 详细字段说明见 DATA_FORMATS.md 及 NPC_GENERATION.md。
 
@@ -130,18 +130,20 @@ letter.gd 根据 word_pool 动态生成可拖拽按钮，拖拽后更新 player_
 
 称谓/落款：根据关系从对应词库中随机选一项作为正确答案，整个词库作为 word_pool。
 
-正文三空：分别从 BODY_SLOT1_WORDS 等词库中随机选词作为正确答案，词库整体作为候选。
+正文三空：按信型从 BODY_POOLS[信型] 的 slot1/2/3 各随机选一词作为正确答案，该信型的整个词库作为候选。
 
-反馈：从三个反馈池各随机选一条。
+反馈：从四个反馈池各随机选一条。
 
-报酬固定为 base_fee=12，perfect_bonus=8。
+报酬随天数递增：base_fee = 12 + (day-1)/3，perfect_bonus = 8 + (day-1)。
 
 生成算法伪代码见 NPC_GENERATION.md。
 
 判定规则
 格式错误：答案为空或不在对应 word_pool 中 → 每项扣2文，结果码 WRONG。
 
-内容错误：答案在词库中但与 correct 不符 → 仅得基础报酬，结果码 NORMAL。
+内容错误：答案在词库中但与 correct 不符 → 得 60% 基础报酬，结果码 NORMAL。
+
+优良：五项中四对 → 基础报酬 + 70% 完美加成，结果码 GOOD。
 
 完美：五项全对 → 基础+完美加成，结果码 PERFECT。
 
@@ -153,7 +155,7 @@ letter.gd 根据 word_pool 动态生成可拖拽按钮，拖拽后更新 player_
 ✅ 已完成
 启动菜单、剧情说明、主界面、代写界面、结局界面
 
-随机NPC生成系统（仅家书类型）
+随机NPC生成系统（五种信型：家书/请安/贺寿/诉苦/求荐）
 
 判定系统（格式/内容/计费/反馈）
 
