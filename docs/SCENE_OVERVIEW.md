@@ -80,7 +80,7 @@
 
 - `Main: Control`（脚本：`main.gd`）
   - `Background: TextureRect`  
-    - 全屏背景图 `main_bg.png.png`。
+    - 全屏背景图 `main_bg.png`。
   - `MainPanel: Panel`（带圆角与米黄色背景的主内容面板）
     - `VBoxContainer: VBoxContainer`（垂直布局主内容）
       - `StatusBar: HBoxContainer`  
