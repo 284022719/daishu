@@ -50,8 +50,15 @@ whenToUse: 任务涉及 Godot 引擎 / GDScript / 场景 / 节点 / 信号 / 资
 
 - **断言 API 必须给出处**：`classes\class_xxx.rst` 文件名 + 行号。查不到就直说"文档里没有"，不要拿 3.x 的旧记忆补齐。
 - 本项目是 4.x：留意 `@export` 注解写法、`Tween`、`Callable`、`Node.owner` 语义、单例访问方式等 4.x 与 3.x 的差异；文档里标 `deprecated` 的一律不用。
-- **本机不能联网取文档**：`docs.godotengine.org`、`github.com`、`raw.githubusercontent.com`、`downloads.tuxfamily.org` 均 SSL 不通，且本部署没有 `web_fetch` 工具（只有 `web_search`）。不要试图抓网页，一律查本地语料；需要引用官网 URL 时只把它当"给人看的链接"，不作检索源。
-- **但以下主机可达**（2026-09 实测）：`godotengine.org`（主站，HTTP 200）、`downloads.godotengine.org`（会 302 到 `release-assets.githubusercontent.com`）。**导出模板正是从这里下**，见文末。
+- **本机现在可以联网取文档了**（2026-10-10 复测，推翻了 2026-09 的结论）：`web_fetch` 工具**存在**
+  （此前记的"只有 `web_search`"已过时），且 `docs.godotengine.org` 实测 **HTTP 200**。
+  **但第一依据仍是本地语料**——它锚定 4.6 分支，而官网 `/en/stable/` 未必是 4.6。
+  联网只在两种情况下用：① 本地语料里确实没有；② 交叉核对某条 API 是否在 4.6 之后有变更。
+  引用官网时要**说明它可能不是 4.6**。
+- **以下主机可达**（2026-09 实测）：`godotengine.org`（主站，HTTP 200）、`downloads.godotengine.org`
+  （会 302 到 `release-assets.githubusercontent.com`）。**导出模板正是从这里下**，见文末。
+  > 注意区分：`web_fetch`（宿主工具，不受 rules.yaml 代理约束）与 shell 里的 `Invoke-WebRequest`
+  > （走白名单代理，未列出即 403）是两条路。抓网页优先用 `web_fetch`。
 - 拿不准就是在猜。宁可多读一篇 rst，也不要写一个没出处的 API。
 
 # 项目文档地图（代书，`D:\daishu`）
@@ -88,15 +95,22 @@ whenToUse: 任务涉及 Godot 引擎 / GDScript / 场景 / 节点 / 信号 / 资
    先怀疑文件权限，别怀疑代码。
 4. **`unique_id=` 是 4.6 新语法**（`engine_details\file_formats\tscn.rst:104`），不是 3.x 残留；
    `load_steps` 在 4.6 已废弃、可忽略（同文件 `:51-53`）。别把它们当错误去"修"。
-5. **godot-mcp 已接通，但 `GODOT_PATH` 指错会静默失效** —— 本部署注册了 **14 个** `mcp__godot__*` 工具
+5. **godot-mcp 的接线只在 `web` profile 里，当前默认的 `desktop` profile 没有** ——
+   这点 2026-10-10 核过：`~\.dsh\profiles\web\cordis.patch.yml` 有 `mcp-godot` 条目，
+   而 `~\.dsh\profiles\desktop\cordis.patch.yml` **没有任何 mcp 条目**。
+   所以**在 desktop 里 `mcp__godot__*` 这 14 个工具是不存在的**（历史会话统计佐证：带 godot 工具
+   的请求全部来自 web profile 时期的会话，10 月迁到 desktop 之后一次都没有）。
+   本部署共注册 **14 个** `mcp__godot__*` 工具
    （`launch_editor` / `run_project` / `get_debug_output` / `stop_project` / `get_godot_version` /
    `list_projects` / `get_project_info` / `create_scene` / `add_node` / `load_sprite` /
    `export_mesh_library` / `save_scene` / `get_uid` / `update_project_uids`），实测 `get_godot_version`
-   返回 `4.6.1.stable.mono.official`。两个坑：
+   返回 `4.6.1.stable.mono.official`。三个坑：
+   - **想在 desktop 里用它，得把同一条 `insert` 抄进 desktop 的 patch**（复制 web 那份即可，
+     注意 `GODOT_PATH` 必须指向 `*_console.exe`），改完需要重启 DSH。
    - `GODOT_PATH` **必须指向 `*_console.exe`**：不带 console 的 exe 在 stdout 被重定向时输出 0 字节，而
      `run_project` / `get_debug_output` 靠捕获 stdout 工作 —— 指错**不报错，只是静默拿不到调试输出**。
-   - 接线有**两处、互不相干**：项目内 `.claude\mcp.json`（被 gitignore）与 DSH 的
-     `~\.dsh\profiles\web\cordis.patch.yml`（`mcp-godot` 条目，由 watchUserPatches 热监听，保存即生效）。
+   - 接线有**两处、互不相干**：项目内 `.claude\mcp.json`（被 gitignore）与 DSH profile 的
+     `cordis.patch.yml`（`mcp-godot` 条目，由 watchUserPatches 热监听，保存即生效）。
      复现用 `tools\setup-godot-mcp.ps1` —— 它**必须用 SSH 克隆**（本机 HTTPS 到 github.com 不通）。
 6. **美术素材必须像素级校验，禁止目测**（ART_PLAN §四 已把这写成硬规范）—— 用 `tools\art_check.mjs`
    （零依赖，只用 node 内置 `zlib`，自带 PNG 解码/编码，**不需要 npm install**）：
