@@ -9,6 +9,56 @@
 
 ---
 
+## 0. 先看这里：**本机 SD 能跑，但底模不对**（2026-10-12 实测）
+
+⚠️ **这一节是实测结论，先读完再决定谁来出图。**
+
+本机**装着完整的 Stable Diffusion WebUI**（绘世启动器），且我**已经把它跑通并实际出过图**：
+
+| 事实 | 值 |
+|---|---|
+| 位置 | `D:\绘世启动器`（SD WebUI v1.10.1）|
+| 便携 Python | `D:\绘世启动器\.ext\python.exe`（3.10.11，**依赖完整**，无需建 venv）|
+| GPU | RTX 2060 SUPER **8GB**（`torch 2.3.1+cu121`、`xformers 0.0.27`）|
+| 出图速度实测 | SDXL 1344×756 / 28 步 ≈ **36 秒/张**（一次 3 张用 108 秒）|
+| 已验证 | API 可调（`/sdapi/v1/txt2img`），出图落盘正常 |
+
+**但——`--no-download-sd-model` 与下面的事实导致"出一张能用的图"卡在底模上：**
+
+| 本机已装底模 | 类型 | 与本项目 `main_bg.png` 的实测距离 |
+|---|---|---|
+| `Illustrious-XL-v2.0` | 动漫插画 | 相邻差 **32.2**（基准 6.3）= **5.07×** |
+| `waiIllustriousSDXL_v170` | 动漫插画 | 同类 |
+| `autismmixSDXL_autismmixConfetti` | 动漫插画 | 同类 |
+| `v1-5-pruned-emaonly` | SD1.5 通用 | 太弱，出不了风格 |
+| `国风武侠Chinese style.ckpt` | SD1.5 国风 | 非像素风 |
+
+**实测三张 SDXL 出图 vs 项目基准 `main_bg.png`**：
+
+| | 平均相邻差 | 硬边 ≥90 | 与基准比值 |
+|---|---|---|---|
+| 基准 `main_bg.png` | **6.3** | **0.1%** | — |
+| 出图 ① | 32.2 | **9.2%** | 5.07× |
+| 出图 ② | 30.2 | 8.7% | 4.76× |
+| 出图 ③ | 34.2 | 11.9% | 5.39× |
+
+**相邻差是基准的 5 倍、硬边是 90 倍。** 这不是"风格略不同"，是**完全不同的渲染方式**：
+本机模型给的是"**抖动噪点**"，项目 `main_bg.png` 要的是"**大面积平坦色块 + 极低硬边**"。
+
+**另一个坑**：提示词里的 `leaves the upper-center empty (plain sky) for a title` **对动漫底模基本无效** ——
+三张出图的上中部全被楼阁/塔占满（正是标题要放的位置），选图阶段直接淘汰。
+
+**结论**：卡点**不是算力，是缺一个像素风/扁平插画底模**（项目底图当初用的 `Anything XL` 本机已不在，
+`D:\anythingxl\` 里只有个 streamlit 演示、没有模型权重）。
+**所以作业单仍然成立**，出图这一步要么换底模，要么用外部工具。
+
+**若换成"我来自动出图"**，需要先解决底模，从易到难：
+1. **你指定一个本机已有的模型**，我照着出（但上表说明现有的都不合适）
+2. **你提供一个像素风底模**（放进 `D:\绘世启动器\models\Stable-diffusion\`），我全程自动出图 + 跑判据 + 挑图
+3. **放开 huggingface / civitai 的网络访问**，我下载一个像素风底模（**这需要你改策略，我不自行申请**）
+
+---
+
 ## 1. 要解决的问题（一句话）
 
 标题页 `main.png` 是**水墨风**、主界面 `main_bg.png` 是**像素插画风**，两张不是一族。
@@ -99,13 +149,38 @@ grid lines not aligned
 
 ---
 
-## 5. 你做完交给我，我做什么
+## 5. 两条路：你出图 / 我自动出图
 
-**你**：把选中的图放进 `assets/images/_incoming/`（临时目录，**不入库**），告诉我文件名。
+### 路 A：用外部工具出图（当前默认，因为本机底模不对）
 
-**我**（拿到图后，全部有现成命令）：
+**你**：按 §2–§4 出 4~6 张 → 挑"上中干净"的 → 放进 `assets/images/_incoming/` → 告诉我文件名。
 
-1. **规整到精确 16:9**（若不是）—— 用 `tools/wm_clean.gd`（`--crop-through`）+ `Image.resize(LANCZOS)`
+### 路 B：我来自动出图（本机 SD，**管线已验证可跑**）
+
+前提是**先解决底模**（见 §0）。底模就位后，以下步骤我全部可自动化：
+
+```powershell
+# 1. 启动 SD WebUI（离线模式，关键——见 §10）
+$h = 'D:\绘世启动器'
+$env:PYTHON            = "$h\.ext\python.exe"
+$env:VENV_DIR          = '-'          # 跳过 venv，直接用 .ext 的 python
+$env:SKIP_VENV         = '1'          #   否则首次启动要下 2-4 GB 的 torch
+$env:HF_HOME           = 'D:\dsh\tmp\hfcache'   # 见 §10 的离线缓存
+$env:HF_HUB_OFFLINE    = '1'
+$env:TRANSFORMERS_OFFLINE = '1'
+$env:PYTHONIOENCODING  = 'utf-8'      # 否则中文/emoji 打印会 UnicodeEncodeError
+$env:COMMANDLINE_ARGS  = '--api --listen --port 7860 --medvram --xformers --skip-version-check --no-download-sd-model'
+Set-Location $h
+& "$h\.ext\python.exe" launch.py      # 后台跑
+
+# 2. 出图（脚本 tools\gen_sd.py：用标准库 urllib，不依赖 requests）
+& "$h\.ext\python.exe" tools\gen_sd.py --out D:\dsh\tmp\title_v1.png `
+    --model '<底模文件名>' --width 1344 --height 756 --steps 28 --cfg 7 --seed -1 --n 4
+```
+
+**接入**（两条路都一样，我执行）：
+
+1. **规整到精确 16:9**（若不是）—— `tools/wm_clean.gd`（`--crop-through`）+ `Image.resize(LANCZOS)`
 2. **覆盖** `assets/images/backgrounds/main.png` 并**强制重导**（尺寸变了通常自动重导；
    若报旧图，按 `AI_PLAYBOOK` 第 17 条删 `.godot/imported/main.png-*.ctex`）
 3. **可选加固**：给 `title_screen.tscn` 的 `TextureRect` 补 `stretch_mode = 5`，
@@ -175,3 +250,73 @@ node tools/art_check.mjs crop "$bg\main.png" --box <可疑区> --out check.png
 | `button_9slice`（按钮九宫格）| **已由 `theme/daishu_theme.tres` 实现**（⑧ 那轮）|
 | `cursor_brush`（毛笔光标）| 拖拽预览已用 `brush_cursor.png`；真光标属 ⑫，另需"单一笔尖"图 |
 | `main_bg` / 结局 / 序章 / 头像 | 本次范围只要标题图 1 张（提示词库里对应组仍有效，日后可直接取用）|
+
+---
+
+## 9. 本机 SD 出图产物（证据留档，2026-10-12）
+
+**已入库**（可直接打开看，不必去 tmp 找）：
+
+| 文件 | 说明 |
+|---|---|
+| `docs/screenshots/regen_try_sdxl_01.png` | 1344×756 / 28 步，seed 12345 —— 上中全被楼阁占满，**不合格** |
+| `docs/screenshots/regen_try_sdxl_02.png` | 同上 —— 粉紫天空 + 高饱和青绿伪影，**不合格** |
+
+**留在 tmp（中间产物，不登记）**：
+
+| 文件 | 说明 |
+|---|---|
+| `D:\dsh\tmp\sd_smoke.png` | 冒烟验证（384×216/8 步），证明链路通 |
+| `D:\dsh\tmp\title_sdxl_01..03.png` | 正式参数 3 张原图 |
+
+**复用脚本**：`tools\gen_sd.py`（出图 → base64 解码 → 落盘，含底模切换与 seed 记录）。
+
+---
+
+## 10. 本机跑 SD 的两个坑（实测，下次直接绕）
+
+### 坑 1：SDXL 加载失败 → 被策略代理 403（**已解决**）
+
+**症状**：`Loading weights [...]` 之后立刻
+
+```
+requests.exceptions.ProxyError: ... huggingface.co ... /openai/clip-vit-large-patch14/resolve/main/vocab.json
+  (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')))
+Stable diffusion model failed to load
+```
+
+**原因**：SDXL 的文本编码器要 **CLIP tokenizer**（`openai/clip-vit-large-patch14` 的
+`vocab.json` / `merges.txt` / `tokenizer_config.json`），它不在 `transformers` 默认缓存里，
+WebUI 就去 huggingface.co 下 —— 而本机所有出网走策略代理，该域名被 403。
+
+**关键发现：文件本来就在本机**，在绘世启动器自己的镜像缓存里：
+
+```
+D:\绘世启动器\.cache\sdwebuilauncher\hfmirror\refs\openai\clip-vit-large-patch14\main\
+    config.json  merges.txt  model.safetensors  special_tokens_map.json  tokenizer_config.json  vocab.json
+```
+
+**解决**：把它摆成 HF 缓存布局，然后**离线启动**（`models--openai--clip-vit-large-patch14` 是 HF 的目录命名法）：
+
+```
+D:\dsh\tmp\hfcache\hub\models--openai--clip-vit-large-patch14\
+    refs\main                                  ← 内容 = 快照目录名
+    snapshots\<任意名>\{vocab.json, merges.txt, tokenizer_config.json, ...}
+```
+
+然后设 `HF_HOME=D:\dsh\tmp\hfcache`、`HF_HUB_OFFLINE=1`、`TRANSFORMERS_OFFLINE=1`。
+**验证**（应输出 `TOKENIZER_OK vocab_size=49408`）：
+
+```powershell
+& 'D:\绘世启动器\.ext\python.exe' -c "from transformers import CLIPTokenizer; print('TOKENIZER_OK', CLIPTokenizer.from_pretrained('openai/clip-vit-large-patch14').vocab_size)"
+```
+
+### 坑 2：不要用 `.bat` 起，也不要 `-FilePath 'node'` 式的写法
+
+- **`.bat` + 中文路径**：用 ASCII 编码写 bat 会把 `D:\绘世启动器` 变成 `D:\?????`，启动必失败。
+  用 PowerShell 的 `$env:` + `& <绝对路径>` 代替。
+- **`PYTHONIOENCODING=utf-8` 必须设**：控制台是 GBK，脚本里打印 `✅` 这类字符会
+  `UnicodeEncodeError: 'gbk' codec can't encode character` —— **报错位置在最后一行 print，
+  会让人误以为前面的逻辑失败**（实际前面已经成功）。
+- **`Start-Process -FilePath 'node'` 静默失败**：Windows 上 `node` 不是可执行文件名，
+  要用 `(Get-Command node).Source` 拿绝对路径，否则进程起不来、输出 0 字节。
