@@ -115,14 +115,20 @@ whenToUse: 任务涉及 Godot 引擎 / GDScript / 场景 / 节点 / 信号 / 资
      `subagent-model-selection-settings`）会被应用以它自己的权威副本覆盖，手写会被剪掉 ——
      那种设置要去 GUI 改。
 
-   **Godot 装在哪**：`D:\Godot_v4.6.1-stable_mono_win64\`
-   （2026-10-10 从 `C:\Users\28402\Downloads\...` 迁出 —— Downloads 是临时目录，清理下载就会失效）。
+   **Godot 装在哪**：`D:\Program Files\Godot_v4.6.1-stable_mono_win64\`
+   （沿革：最早在 `C:\Users\28402\Downloads\...` —— Downloads 是临时目录，清理下载就会失效；
+   2026-10 先迁到 D 盘根，**2026-10-11 又按 `D:\dsh\AGENTS.md`「软件只往两个 Program Files 落」
+   归位到 `D:\Program Files\`**。所以更早的文档里那条"D 盘根 + 版本号目录名"的写法**已全部失效**，
+   别再照抄 —— 这也是 2026-10-11 那次 godot-mcp 起得来却报 `ENOENT` 的原因。）
    console exe 的完整路径：
-   `D:\Godot_v4.6.1-stable_mono_win64\Godot_v4.6.1-stable_mono_win64_console.exe`。
-   **引用这个路径的地方共 6 处**，升级 Godot 版本时要一起改：两个 profile 的 `cordis.patch.yml`、
+   `D:\Program Files\Godot_v4.6.1-stable_mono_win64\Godot_v4.6.1-stable_mono_win64_console.exe`。
+   ⚠️ 新路径**含空格**：这些引用点要么用引号整体包起来、要么作为 `spawn` 的参数传入（不经 shell），
+   所以空格安全 —— 但**别**把它拼进一条未加引号的命令行。
+   **引用这个路径的地方共 6 处**（2026-10-11 逐处核对），升级 Godot 版本或再搬目录时要一起改：
+   两个 profile 的 `cordis.patch.yml`（`mcp-godot` 的 `GODOT_PATH`）、
    `D:\个人项目\daishu\.claude\mcp.json`、`D:\个人项目\daishu\.claude\settings.local.json`（3 条权限项）、
    `D:\个人项目\daishu\.vscode\settings.json` 的 `godotTools.editorPath.godot4`、以及 Godot 自带的
-   `godot.cmd` / `godot-console.cmd`。
+   `godot.cmd` / `godot-console.cmd`（这两个已由搬移脚本同步改好）。
 6. **美术素材必须像素级校验，禁止目测**（ART_PLAN §四 已把这写成硬规范）—— 用 `tools\art_check.mjs`
    （零依赖，只用 node 内置 `zlib`，自带 PNG 解码/编码，**不需要 npm install**）：
    `info` / `palette`（对照 ART_PLAN §二 锚点色，色距 >0.30 判偏离）/ `grid`（栏线像素检测）/
