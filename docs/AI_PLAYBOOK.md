@@ -127,6 +127,15 @@ Description → Properties → Methods → Signals → Enumerations → Constant
     `.import` 与 `.ctex` 都正常生成了。判据：**新增资源后先单独跑完一次 `--import`，
     再跑依赖它的脚本**；报"资源缺失"时先 `Test-Path` 核实 `.import`/`.ctex` 是否真的不在。
     （`--script` 模式本身不会触发导入 —— 见第 8 条。）
+16. （小）**GDScript 同作用域不允许变量重名**：写探针时先后声明两个 `var miss := ""`（一个在 `if`
+    分支里），报 `Parse Error: There is already a variable named "miss" declared in this scope.`
+    —— 哪怕在不同分支也算同一作用域。另：这类**解析失败会让 `--script` 既不执行也不 `quit()`**，
+    表现为命令**挂住不退出**，所以跑探针脚本要带超时。
+17. **改了图片内容但尺寸/字节数没变时，Godot 不会重新导入**：实测把 `letter.png` 换成"裁掉底带
+    再缩放回原尺寸"的版本 —— **尺寸相同（2364×1773）、字节数甚至完全相同（3,838,386 B）**，
+    于是 `--import` 报"无错误"却什么也没做，`.ctex` 仍是旧像素（探针量到的贴图尺寸/绘制区都没变）。
+    判据：**同尺寸改写图片后，必须删掉 `.godot/imported/<图>-<哈希>.ctex` 与 `.md5` 再 `--import`**；
+    验证要落到"渲染出来的图变了没有"，别只看导入命令的退出码。
 
 # 维护与导出
 
