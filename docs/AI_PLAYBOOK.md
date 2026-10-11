@@ -11,10 +11,9 @@ whenToUse: 任务涉及 Godot 引擎 / GDScript / 场景 / 节点 / 信号 / 资
   **2026-10-11 从 `D:\godot-docs` 迁入本项目目录**（见下方「语料的边界」）。
 - **版本锚点 4.6**：本机引擎 v4.6.1-stable (mono) 与文档同代。图片与动图**未检出**，正文里的图片链接指向
   `raw.githubusercontent.com`（本机访问不了）—— **不要追图片**。
-- **语料的边界（2026-10-11 实测，别误解它）**：这是 `blob:none` 的**部分克隆**，本地只有那个提交的树，
-  **没有 blob 对象**；`git status` / `git checkout` 会去 gitcode.com 取 blob，而本机代理拦 403 →
-  报 `could not fetch … from promisor remote`。所以它现在是**只读的纯文本语料**：
-  **拿它查文档可以，拿它切分支/回滚不行**（要切分支得先能连通 gitcode 或重新克隆）。
+- **语料的边界（2026-10-11 实测）**：它是 `blob:none` 的**部分克隆** —— **只能查文档，不能切分支/回滚**
+  （`git checkout` 会去 gitcode.com 取 blob，本机代理拦 403、报 `could not fetch … from promisor remote`）。
+  机制、恢复图片与切分支的做法见 `DETAILS.md`「语料的边界」。
 
 # 目录地图
 
@@ -40,10 +39,8 @@ whenToUse: 任务涉及 Godot 引擎 / GDScript / 场景 / 节点 / 信号 / 资
    `grep pattern="drag and drop" path=D:\个人项目\daishu\godot-docs\tutorials`，命中后读对应 rst。
 4. **查废弃与版本迁移**：`grep pattern="deprecated|removed in 4\." path=D:\个人项目\daishu\godot-docs\tutorials\migrating`。
 
-**类参考结构**：`.. _class_Node2D_method_apply_scale:` + `|void| **apply_scale**(…)`；
-`:ref:`X<class_X>`` 括号里的类型名（转小写）就是下一个能查的文件；章节顺序
-Description → Properties → Methods → Signals → Enumerations → Constants；顶部 `Properties`/`Methods`
-总览表用来快速判断"这个类到底有没有这个能力"。
+**类参考结构**：顶部 `Properties`/`Methods` 总览表最快判断"这个类到底有没有这个能力"；
+锚点写法（`.. _class_X_method_y:`）、`:ref:` 反查与章节顺序见 `DETAILS.md`「类参考结构」。
 
 # 纪律
 
@@ -87,11 +84,10 @@ Description → Properties → Methods → Signals → Enumerations → Constant
 3. **Godot 段错误先怀疑文件权限**：沙箱拦 `user://` 写入时崩在项目加载**之前**（`--check-only` 也崩、
    `--verbose` 无任何资源加载输出）—— 是环境问题，不是代码问题。
 4. **`unique_id=` 是 4.6 新语法**（`load_steps` 已废弃）—— 别当错误去"修"。
-5. **godot-mcp 接线会"自己消失"，状态必须现查**：条目是 profile `cordis.patch.yml` 里的 `mcp-godot`
-   （`insert`，热监听）。**判据三查**：① 文件里有 `mcp-godot` ② 进程表有
-   `node.exe … godot-mcp\build\index.js` ③ 新会话工具清单里有 `mcp__godot__*`。`GODOT_PATH` 必须是
-   `*_console.exe`，**指错不报错、只是静默没有调试输出**；路径失效则静默回落到内置默认值。
-   Godot 现装在 `D:\Program Files\Godot_v4.6.1-stable_mono_win64\`（含空格，别拼进未加引号的命令行）。
+5. **godot-mcp 接线会"自己消失"，状态必须现查**（条目在 profile `cordis.patch.yml`）。**判据三查**：
+   ① 文件里有 `mcp-godot` ② 进程表有 `node.exe … godot-mcp\build\index.js` ③ 新会话工具清单里有 `mcp__godot__*`。
+   `GODOT_PATH` 必须是 `*_console.exe`（**指错不报错、只是静默没有调试输出**；路径失效会静默回落到内置默认值，
+   症状是 `spawn … ENOENT`）。Godot 装在 `D:\Program Files\Godot_v4.6.1-stable_mono_win64\`（含空格，别拼进未加引号的命令行）。
 6. **美术素材必须像素级校验，禁止目测**：`tools\art_check.mjs`（零依赖）——
    `info` / `palette`（色距 >0.30 判偏离）/ `grid` / `watermark` / `crop`；
    带网格的底图改锚点必须走 `grid` → 写锚点 → 截图复验三步。
@@ -100,61 +96,41 @@ Description → Properties → Methods → Signals → Enumerations → Constant
 8. **`--script` 模式不导入新资源**：新加的图片在 `--script` 下 `ResourceLoader.exists()` 返回 **false**、
    **静默加载失败**（贴图为 null，不报错）。判据：新资源先跑一次
    `godot --headless --path . --import`（生成 `.import` + `.ctex`），再跑截图/测试。
-9. **`_get_drag_data()` 不能直接调**：没有真实拖拽在进行时，里面的 `set_drag_preview()` 会触发引擎断言
-   `Condition "!get_viewport()->gui_is_dragging()" is true`。判据：**把预览构造抽成独立函数**
-   （本项目 `build_drag_preview()`），测试只调它；顺带 Godot 会给 `docs\` 下的配图也生成 `.import`，
-   那些是文档图、不该进仓库。
-10. **`.tres` 里 stylebox 的键名别手写，让引擎写**：本地语料没有 `.tres` 示例，手写 `Button/styles/normal`
-    这类键猜错会**静默失效**（主题挂上了却没样式）。判据：用代码建 `Theme` 再 `ResourceSaver.save()`；
-    方向反过来时——**改完立即 `load()` 回读会命中写入前的缓存**（实测 `default_font_size` 读到上一版），
-    回读要**读文件文本**，语义校验另起一个进程。
-11. **`Font.fallbacks` 不会进 `.tres`，且 Godot 不会自动回退系统字体**：赋在 `FontFile` 上或包一层
-    `FontVariation` 都一样，存盘再 load 回来都是 0 条 —— **只能运行时挂**（本项目 `scripts/FontFallback.gd`
-    自启动）。判据：拿一个**主字体确实没有**的字符渲染一张图看是不是方块（实测项目外用字确实渲染成方块）。
-    另：挂了兜底后字体变成 `FontVariation`，它**没有 `font_name`**，要取 `.base_font.font_name`。
-12. **命令行 `--resolution` 会连同视口一起改，截图会被缩放**：实测给 `900x260` 时出图只有 `462x260`
-    （约 0.40 倍），而拿它当像素依据会得出错误结论。判据：截图工具自己 `DisplayServer.window_set_size()`
-    + `get_root().size`，**写完图断言尺寸**，不符就报错而不是静默产出。
-13. **全局 Theme 的字号会改变布局、撑破容器**：实测字号 20 + 内容边距 8 时，代写界面左侧 15 个词库按钮
-    撑出面板、底部被裁。判据：**换全局字号后必须重截所有用了列表/多按钮的界面**，
-    并按"按钮数 × 单按钮高"估算是否装得下。
-14. **截图工具漏了初始化步骤时，界面会"看着像游戏坏了"**：`letter.tscn` 靠 `main.gd` 调
-    `init_with_npc(id)` 才填充词库；截图工具直接实例化场景、没调它，于是左侧词库空白 ——
-    而我据此差点判定"主题改动把词库按钮弄没了"。判据：**截图/自动化工具要复刻真实入口的初始化调用链**；
-    出图看着不对时，先怀疑工具漏步骤，用探针打印**节点数与尺寸**再下结论（实测按钮一直都在）。
-15. **`--import` 是异步的：它还没写完就去 `ResourceLoader.exists()` 会得到"资源缺失"的假象**：
-    实测刚复制进项目的 `button_frame.png`，立刻跑构建脚本报"按钮贴图缺失"，但片刻后
-    `.import` 与 `.ctex` 都正常生成了。判据：**新增资源后先单独跑完一次 `--import`，
-    再跑依赖它的脚本**；报"资源缺失"时先 `Test-Path` 核实 `.import`/`.ctex` 是否真的不在。
-    （`--script` 模式本身不会触发导入 —— 见第 8 条。）
-16. （小）**GDScript 同作用域不允许变量重名**：写探针时先后声明两个 `var miss := ""`（一个在 `if`
-    分支里），报 `Parse Error: There is already a variable named "miss" declared in this scope.`
-    —— 哪怕在不同分支也算同一作用域。另：这类**解析失败会让 `--script` 既不执行也不 `quit()`**，
-    表现为命令**挂住不退出**，所以跑探针脚本要带超时。
-17. **改了图片内容但尺寸/字节数没变时，Godot 不会重新导入**：实测把 `letter.png` 换成"裁掉底带
-    再缩放回原尺寸"的版本 —— **尺寸相同（2364×1773）、字节数甚至完全相同（3,838,386 B）**，
-    于是 `--import` 报"无错误"却什么也没做，`.ctex` 仍是旧像素（探针量到的贴图尺寸/绘制区都没变）。
-    判据：**同尺寸改写图片后，必须删掉 `.godot/imported/<图>-<哈希>.ctex` 与 `.md5` 再 `--import`**；
-    验证要落到"渲染出来的图变了没有"，别只看导入命令的退出码。
-18. **改 Markdown 章节后必须跑结构守卫，别靠眼睛**：**拿"标题行"当 edit 的替换锚点**最容易
-    漏写回旧标题 —— 旧标题消失、正文成了"挂在上一节下面"的孤儿：**内容都还在，肉眼扫过去像正常文档**。
-    实测 2026-10-12 在同一个文件（`docs/PRE_RELEASE_UI_CHECK.md`）里**同一手法连踩三次**，
-    还留下过重复表格行。判据：**用 `node tools/md_structure_check.mjs <file.md>`**（本项目工具，
-    带 `--selftest`）检查标题重复 / 空节孤儿 / 表格分隔行配对 / 游离表格行 / 代码围栏配对；
-    插入章节时**以正文首行当锚点**（把标题拼进 new_string）。
+9. **`_get_drag_data()` 不能直接调**：无真实拖拽时 `set_drag_preview()` 触发引擎断言
+   `!get_viewport()->gui_is_dragging()`。判据：**预览构造抽成独立函数**（本项目 `build_drag_preview()`）只调它；
+   另：Godot 会给 `docs\` 配图生成 `.import`，那些是文档图、不该进仓库。
+10. **`.tres` 里 stylebox 的键名别手写，让引擎写**：手写 `Button/styles/normal` 这类键猜错会**静默失效**
+    （主题挂上了却没样式）。判据：用代码建 `Theme` 再 `ResourceSaver.save()`；**改完立即 `load()` 回读会命中
+    写入前的缓存**，回读要**读文件文本**，语义校验另起进程。
+11. **`Font.fallbacks` 不会进 `.tres`，Godot 也不会自动回退系统字体** —— **只能运行时挂**（本项目
+    `scripts/FontFallback.gd` 自启动）。判据：拿一个**主字体确实没有**的字符渲染一张图看是不是方块；
+    挂了兜底后字体是 `FontVariation`，取名字要用 `.base_font.font_name`。
+12. **命令行 `--resolution` 会连同视口一起改，截图会被缩放**（实测要 `900x260` 出图只有 `462x260`），
+    拿它当像素依据会得出错误结论。判据：截图工具自己设窗口尺寸，**写完图断言尺寸**，不符就报错。
+13. **全局 Theme 的字号会改变布局、撑破容器**（实测字号 20 时 15 个词库按钮撑出面板）。
+    判据：**换全局字号后必须重截所有用了列表/多按钮的界面**，并按"按钮数 × 单按钮高"估算是否装得下。
+14. **截图工具漏了初始化步骤时，界面会"看着像游戏坏了"**（本项目词库空白，差点误判成主题改动所致）。
+    判据：**截图/自动化工具要复刻真实入口的初始化调用链**；出图不对先用探针打印**节点数与尺寸**再下结论。
+15. **`--import` 是异步的**：它还没写完就去 `ResourceLoader.exists()` 会得到"资源缺失"的假象。
+    判据：**新增资源后先单独跑完一次 `--import`**，再跑依赖它的脚本；报缺失时先 `Test-Path` 核实
+    `.import`/`.ctex` 是否真的不在（`--script` 模式根本不会触发导入 —— 见第 8 条）。
+16. （小）**GDScript 同作用域不允许变量重名**（哪怕在不同 `if` 分支），报 `There is already a variable
+    named …`；这类**解析失败会让 `--script` 既不执行也不 `quit()`**（命令挂住不退出），跑探针脚本要带超时。
+17. **改了图片内容但尺寸/字节数没变时，Godot 不会重新导入**（实测"裁掉底带再缩回原尺寸"：尺寸与字节数
+    都相同 → `--import` 报"无错误"、`.ctex` 仍是旧像素）。判据：**同尺寸改写图片后删掉
+    `.godot/imported/<图>-<哈希>.ctex` 与 `.md5` 再 `--import`**；验证要落到"渲染出来的图变了没有"。
+18. **改 Markdown 章节后必须跑结构守卫，别靠眼睛**：**拿"标题行"当 edit 锚点**最容易漏写回旧标题，
+    正文就成了"挂在上一节下面"的孤儿（内容都在，肉眼看着正常）。判据：**`node tools/md_structure_check.mjs
+    <file.md>`**（本项目工具，带 `--selftest`）；插入章节**以正文首行当锚点**。
 
 # 维护与导出
 
 - **装导出模板**（没有它无法产出 exe）、**升级引擎切语料分支**、**恢复图片**、**网络可达性**：
-  命令与注意事项见 `DETAILS.md`「维护与导出」。
-- 要点：`%APPDATA%\Godot\export_templates\` 默认空；mono 引擎要 `mono_export_templates.tpz`；
-  **slug 与引擎口味不一致不会报错、只会导出失败**。
+  命令见 `DETAILS.md`「维护与导出」。只留一条判据：**slug 与引擎口味不一致不会报错、只会导出失败**
+  （mono 引擎要 `mono_export_templates.tpz`；`%APPDATA%\Godot\export_templates\` 默认为空）。
 
-# 源码与同步（本文件即 DSH 技能 `godot-docs` 的源）
+# 源码与同步
 
-- **源**（受 git 版本控制，改这里）：`docs\AI_PLAYBOOK.md`（判据，常驻）+
-  `docs\AI_PLAYBOOK-DETAILS.md`（细则，按需）
-- **镜像**（DSH 实际读取；它在用户目录下、不在任何 git 仓库里，换机器或重装 DSH 会丢）：
-  `C:\Users\28402\.dsh\skills\godot-docs\SKILL.md` + 同目录 `DETAILS.md`
-- 改完必须同步，否则 DSH 读到的仍是旧知识：
-  `pwsh -File tools\sync-ai-playbook.ps1`（`-Check` 只查漂移，不一致 exit 1）
+- 改 `docs\AI_PLAYBOOK.md`（判据）+ `docs\AI_PLAYBOOK-DETAILS.md`（细则），**改完必须**
+  `pwsh -File tools\sync-ai-playbook.ps1` 同步镜像（DSH 读的是 `~\.dsh\skills\godot-docs\`；
+  `-Check` 只查漂移）。镜像路径与"为什么必须同步"见 `DETAILS.md`「源码与同步」。
