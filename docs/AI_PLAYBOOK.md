@@ -4,66 +4,56 @@ description: 查本地 Godot 4.6 官方文档语料（类参考 1066 篇 + 教�
 whenToUse: 任务涉及 Godot 引擎 / GDScript / 场景 / 节点 / 信号 / 资源 / 导出 / 渲染或物理设置 / 报错排查时
 ---
 
-# 语料
+# 语料（第一依据 —— 别凭记忆写 API）
 
-- 位置：`D:\godot-docs`（gitcode 镜像的 godot-docs 仓库，**4.6 分支**，HEAD `b10b7ed`）
-- **版本锚点 4.6**：本机引擎是 Godot v4.6.1-stable (mono)，文档与引擎同代。升引擎要切分支（见文末）。
-- 纯文本稀疏检出：只有 `.rst`，1568 篇 / 30.7 MB。图片与动图**未检出**，文档正文里的图片链接指向 `raw.githubusercontent.com`，本机也访问不了 —— **不要追图片**。
+- `D:\godot-docs`：gitcode 镜像的 godot-docs 仓库，**4.6 分支**（HEAD `b10b7ed`），纯文本稀疏检出
+  1568 篇 `.rst`（30.7 MB）。
+- **版本锚点 4.6**：本机引擎 v4.6.1-stable (mono) 与文档同代。图片与动图**未检出**，正文里的图片链接指向
+  `raw.githubusercontent.com`（本机访问不了）—— **不要追图片**。
 
 # 目录地图
 
 | 要查什么 | 去哪 |
 |---|---|
-| 类参考（属性 / 方法 / 信号 / 枚举 / 常量） | `D:\godot-docs\classes\class_<小写类名>.rst`：`Node2D`→`class_node2d.rst`，`HTTPRequest`→`class_httprequest.rst` |
-| GDScript 语言本身（语法、类型、注解） | `D:\godot-docs\classes\class_@gdscript.rst` |
-| 全局函数与单例（`print` / `load` / `Input` / `Engine`…） | `D:\godot-docs\classes\class_@globalscope.rst` |
-| 教程与最佳实践 | `D:\godot-docs\tutorials\<主题>\`：2d 3d animation assets_pipeline audio best_practices editor export i18n inputs io math migrating navigation networking performance physics platform plugins rendering scripting shaders ui xr |
-| 入门 | `D:\godot-docs\getting_started\` |
-| 引擎内部机制 | `D:\godot-docs\engine_details\` |
+| 类参考（属性 / 方法 / 信号 / 枚举 / 常量） | `classes\class_<小写类名>.rst`：`Node2D`→`class_node2d.rst`、`HTTPRequest`→`class_httprequest.rst` |
+| GDScript 语言本身（语法、类型、注解） | `classes\class_@gdscript.rst` |
+| 全局函数与单例（`print` / `load` / `Input` / `Engine`…） | `classes\class_@globalscope.rst` |
+| 教程与最佳实践 | `tutorials\<主题>\`：2d 3d animation assets_pipeline audio best_practices editor export i18n inputs io math migrating navigation networking performance physics platform plugins rendering scripting shaders ui xr |
+| 入门 / 引擎内部机制 | `getting_started\` / `engine_details\` |
 
 # 检索配方
 
-用 DSH 的 `grep` / `glob` / `read` 工具；**本机 shell 里没有 `rg` 命令**，别在 pwsh 里拼 ripgrep。
+用 DSH 的 `grep` / `glob` / `read` 工具；**本机 shell 里没有 `rg`**，别在 pwsh 里拼 ripgrep。
 
-1. **查某个类**：先 `grep` 定位行号，再 `read` 该片段（类文件通常 300–3000 行）。例如查节点平移：
+1. **查某个类**：先 `grep` 定位行号，再 `read` 该片段（类文件通常 300–3000 行）：
    `grep pattern="move_and_slide|position" path=D:\godot-docs\classes\class_characterbody2d.rst`
-2. **查某个方法/信号/属性在哪个类**（不确定归属时最有用的起手式）：
+2. **不确定方法/信号/属性属于哪个类**（最有用的起手式）：
    `grep pattern="^\.\. _class_\w+_method_move_and_slide:" path=D:\godot-docs\classes`
-   锚点命名规则是 `class_<类名>_(method|property|signal|constant|enum)_<名字>`，把 `method` 换成 `signal`/`property` 就能反查信号和属性。
-3. **查主题做法**（"怎么做拖放 / 存档 / 相机跟随 / 状态机"）：
+   锚点规则是 `class_<类名>_(method|property|signal|constant|enum)_<名字>`，把 `method` 换成
+   `signal`/`property` 即可反查信号与属性。
+3. **查主题做法**（拖放 / 存档 / 相机跟随 / 状态机）：
    `grep pattern="drag and drop" path=D:\godot-docs\tutorials`，命中后读对应 rst。
 4. **查废弃与版本迁移**：`grep pattern="deprecated|removed in 4\." path=D:\godot-docs\tutorials\migrating`。
 
-# 类参考的文件结构（读的时候用得上的锚点）
-
-```
-.. _class_Node2D_method_apply_scale:
-.. rst-class:: classref-method
-|void| **apply_scale**\ (\ ratio\: :ref:`Vector2<class_Vector2>`\ )
-```
-
-- `:ref:`X<class_X>`` 是交叉引用，括号里的类型名（转小写）就是下一个能查的文件名。
-- 章节顺序：Description → Properties → Methods → Signals → Enumerations → Constants → Property/Method Descriptions。
-- 顶部的 `Properties` / `Methods` 总览表用来快速判断"这个类到底有没有这个能力"。
+**类参考结构**：`.. _class_Node2D_method_apply_scale:` + `|void| **apply_scale**(…)`；
+`:ref:`X<class_X>`` 括号里的类型名（转小写）就是下一个能查的文件；章节顺序
+Description → Properties → Methods → Signals → Enumerations → Constants；顶部 `Properties`/`Methods`
+总览表用来快速判断"这个类到底有没有这个能力"。
 
 # 纪律
 
-- **断言 API 必须给出处**：`classes\class_xxx.rst` 文件名 + 行号。查不到就直说"文档里没有"，不要拿 3.x 的旧记忆补齐。
-- 本项目是 4.x：留意 `@export` 注解写法、`Tween`、`Callable`、`Node.owner` 语义、单例访问方式等 4.x 与 3.x 的差异；文档里标 `deprecated` 的一律不用。
-- **本机现在可以联网取文档了**（2026-10-10 复测，推翻了 2026-09 的结论）：`web_fetch` 工具**存在**
-  （此前记的"只有 `web_search`"已过时），且 `docs.godotengine.org` 实测 **HTTP 200**。
-  **但第一依据仍是本地语料**——它锚定 4.6 分支，而官网 `/en/stable/` 未必是 4.6。
-  联网只在两种情况下用：① 本地语料里确实没有；② 交叉核对某条 API 是否在 4.6 之后有变更。
-  引用官网时要**说明它可能不是 4.6**。
-- **以下主机可达**（2026-09 实测）：`godotengine.org`（主站，HTTP 200）、`downloads.godotengine.org`
-  （会 302 到 `release-assets.githubusercontent.com`）。**导出模板正是从这里下**，见文末。
-  > 注意区分：`web_fetch`（宿主工具，不受 rules.yaml 代理约束）与 shell 里的 `Invoke-WebRequest`
-  > （走白名单代理，未列出即 403）是两条路。抓网页优先用 `web_fetch`。
+- **断言 API 必须给出处**：`classes\class_xxx.rst` 文件名 + 行号。查不到就直说"文档里没有"，
+  **不要拿 3.x 的旧记忆补齐**。
+- 本项目是 4.x：留意 `@export` 注解写法、`Tween`、`Callable`、`Node.owner` 语义、单例访问方式；
+  文档里标 `deprecated` 的一律不用。
+- **可以联网，但第一依据仍是本地语料**（它锚定 4.6，官网 `/en/stable/` 未必是 4.6）：
+  `web_fetch` 工具存在（2026-10-10 复测，推翻 2026-09 的旧结论），`docs.godotengine.org` 实测 HTTP 200。
+  只在①本地语料确实没有 ②核对某条 API 在 4.6 之后是否变更 时用；引用官网时要说明它可能不是 4.6。
 - 拿不准就是在猜。宁可多读一篇 rst，也不要写一个没出处的 API。
 
 # 项目文档地图（代书，`D:\个人项目\daishu`）
 
-写《代书》的代码前，先看项目自己的文档——它们比通用教程更贴近本项目约定：
+写代码前先看项目自己的文档 —— 它们比通用教程更贴近本项目约定：
 
 | 要查什么 | 去哪 |
 |---|---|
@@ -75,110 +65,53 @@ whenToUse: 任务涉及 Godot 引擎 / GDScript / 场景 / 节点 / 信号 / 资
 | 平衡数值与模拟结论 | `docs\BALANCE_REPORT.md` |
 | 开发路线图与已知风险 | `docs\DEV_PLAN.md` |
 | 美术方向 / 色板 / 生成提示词 | `docs\ART_PLAN.md`、`docs\ART_BASELINE_ROUND1.md` |
-| 美术素材**校验工具**（色板/栏线/水印）+ 生成提示词 JSON | `tools\art_check.mjs`、`data\art_prompts_round1.json`、`data\art_prompts_round2.json` |
+| 美术素材校验工具 + 提示词 JSON | `tools\art_check.mjs`、`data\art_prompts_round*.json` |
 | 给 AI 助手的项目约定 | `CLAUDE.md` |
 
-⚠️ `docs\readme.md` 曾长期滞后于代码（2026-09 校正过一次）。**代码为准**；文档与实现冲突时以实际实现为准，并顺手把文档改对。
+**代码为准**：文档与实现冲突时以实际实现为准（`docs\readme.md` 曾长期滞后，2026-09 校正过一次），
+并顺手把文档改对。
 
-# 本机踩坑记录（都是实际踩过的）
+# 本机踩坑（结论清单 —— 每条都实际踩过）
 
-1. **`godot --check-only --script` 不注册 autoload** —— 任何引用单例的脚本都会报
-   `SCRIPT ERROR: Compile Error: Identifier not found: PlayerManager / JudgeSystem`。
-   这是**假阳性，不是代码错误**：未改动的 `main.gd`、`title_screen.gd`、`EndGameScreen.gd` 同样报。
-   判定方法：**拿一个没动过、且同样引用单例的脚本做对照组**——全报就是模式问题，只有你改的那个报才是真问题。
-2. **整数除法会警告** —— GDScript 4 对 `/` 两侧都是 `int` 的情况报
-   `WARNING: Integer division. Decimal part will be discarded`。
-   `int(a / b)` 里的 `int()` 是**多余**的且消不掉警告；改用 `floori(a / b.0)`（负数时二者语义不同，注意）。
-   该警告**只在运行时 `GDScript::reload` 出现，headless 启动看不到** —— 想抓它得真跑项目。
-3. **Godot 跑不起来 ≠ 项目有问题** —— 若沙箱拦截 `user://`（`%APPDATA%\Godot\app_userdata\<项目名>`）写入，
-   Godot 会在**项目加载之前**就 signal 11 段错误，且 `--check-only` 单脚本同样崩、`--verbose` 也无任何资源加载输出。
-   先怀疑文件权限，别怀疑代码。
-4. **`unique_id=` 是 4.6 新语法**（`engine_details\file_formats\tscn.rst:104`），不是 3.x 残留；
-   `load_steps` 在 4.6 已废弃、可忽略（同文件 `:51-53`）。别把它们当错误去"修"。
-5. **godot-mcp 已在 `desktop`（当前默认）与 `web` 两个 profile 里接线**，14 个 `mcp__godot__*`
-   工具都可用：`launch_editor` / `run_project` / `get_debug_output` / `stop_project` /
-   `get_godot_version` / `list_projects` / `get_project_info` / `create_scene` / `add_node` /
-   `load_sprite` / `export_mesh_library` / `save_scene` / `get_uid` / `update_project_uids`。
-   实测 `get_godot_version` → `4.6.1.stable.mono.official.14d19694e`，
-   `get_project_info D:\个人项目\daishu` → 认出项目结构。
-   > 沿革：这条接线原先**只在 `web` profile** 里，10 月改用 `desktop` 后这 14 个工具就消失了
-   > （会话统计佐证：带 godot 工具的请求全部来自 web 时期）。2026-10-10 把同一条 `insert`
-   > 抄进 desktop 的 patch 后恢复，**实测热重组即时生效、不需要重启**。
-   三个坑：
-   - `GODOT_PATH` **必须指向 `*_console.exe`**：不带 console 的 exe 在 stdout 被重定向时输出 0 字节，而
-     `run_project` / `get_debug_output` 靠捕获 stdout 工作 —— 指错**不报错，只是静默拿不到调试输出**。
-   - 接线有**两处、互不相干**：项目内 `.claude\mcp.json`（被 gitignore）与 DSH profile 的
-     `cordis.patch.yml`（`mcp-godot` 条目，热监听，保存即生效）。
-     复现用 `tools\setup-godot-mcp.ps1` —— 它**必须用 SSH 克隆**（本机 HTTPS 到 github.com 不通）。
-   - **DSH profile 的 patch 文件里有两种东西，可靠性不同**：`insert` / `id` 覆盖这类
-     **loader patch 手写可靠**；而同一个文件里的 **settings 命名空间**（如
-     `subagent-model-selection-settings`）会被应用以它自己的权威副本覆盖，手写会被剪掉 ——
-     那种设置要去 GUI 改。
+> 完整场景、命令与数字见 `DETAILS.md`「本机踩坑（完整版）」。这里只留"该怎么判"。
 
-   **Godot 装在哪**：`D:\Program Files\Godot_v4.6.1-stable_mono_win64\`
-   （沿革：最早在 `C:\Users\28402\Downloads\...` —— Downloads 是临时目录，清理下载就会失效；
-   2026-10 先迁到 D 盘根，**2026-10-11 又按 `D:\dsh\AGENTS.md`「软件只往两个 Program Files 落」
-   归位到 `D:\Program Files\`**。所以更早的文档里那条"D 盘根 + 版本号目录名"的写法**已全部失效**，
-   别再照抄 —— 这也是 2026-10-11 那次 godot-mcp 起得来却报 `ENOENT` 的原因。）
-   console exe 的完整路径：
-   `D:\Program Files\Godot_v4.6.1-stable_mono_win64\Godot_v4.6.1-stable_mono_win64_console.exe`。
-   ⚠️ 新路径**含空格**：这些引用点要么用引号整体包起来、要么作为 `spawn` 的参数传入（不经 shell），
-   所以空格安全 —— 但**别**把它拼进一条未加引号的命令行。
-   **引用这个路径的地方共 6 处**（2026-10-11 逐处核对），升级 Godot 版本或再搬目录时要一起改：
-   两个 profile 的 `cordis.patch.yml`（`mcp-godot` 的 `GODOT_PATH`）、
-   `D:\个人项目\daishu\.claude\mcp.json`、`D:\个人项目\daishu\.claude\settings.local.json`（3 条权限项）、
-   `D:\个人项目\daishu\.vscode\settings.json` 的 `godotTools.editorPath.godot4`、以及 Godot 自带的
-   `godot.cmd` / `godot-console.cmd`（这两个已由搬移脚本同步改好）。
-6. **美术素材必须像素级校验，禁止目测**（ART_PLAN §四 已把这写成硬规范）—— 用 `tools\art_check.mjs`
-   （零依赖，只用 node 内置 `zlib`，自带 PNG 解码/编码，**不需要 npm install**）：
-   `info` / `palette`（对照 ART_PLAN §二 锚点色，色距 >0.30 判偏离）/ `grid`（栏线像素检测）/
-   `watermark`（白色文字水印判定）/ `crop`（取局部交给人眼或 vision 复核）。
-   已知事实：`letter.png` 是**双线制** —— 13 道栏界 = 12 栏，栏距 174.09px（CV 1.8%）；`grid` 检测值
-   复现了 `letter.tscn` 里既有 6 个锚点（最大差 0.0009），说明锚点本来就是像素实测来的。
-   **任何带网格的底图，改锚点必须走 `grid` → 写锚点 → 截图复验三步**；裁边会平移全部栏线，必须重跑。
-7. **沙箱拦截 `user://` 的 signal 11 有了确切判据**（细化第 3 条）：崩溃前首行必然是
-   `ERROR: Failed to open 'user://logs/godot<时间戳>.log'`，随后 `CrashHandlerException: Program crashed with signal 11`，
-   且**没有任何资源加载输出**（崩溃早于项目加载）。放宽文件权限后同一条命令 **exit 0 且零输出** ——
-   "崩溃点早于任何资源加载"就是环境问题的判据。
+1. **`godot --check-only --script` 不注册 autoload** → 引用单例的脚本一律报 `Identifier not found`，
+   **是假阳性**。判据：拿一个没动过、同样引用单例的脚本做对照组（全报＝模式问题）。
+2. **整数除法警告**：`int(a / b)` 里的 `int()` 多余且消不掉警告，改用 `floori(a / b.0)`（负数语义不同）；
+   该警告只在运行时出现，headless 看不到。
+3. **Godot 段错误先怀疑文件权限**：沙箱拦 `user://` 写入时崩在项目加载**之前**（`--check-only` 也崩、
+   `--verbose` 无任何资源加载输出）—— 是环境问题，不是代码问题。
+4. **`unique_id=` 是 4.6 新语法**（`load_steps` 已废弃）—— 别当错误去"修"。
+5. **godot-mcp 接线会"自己消失"，状态必须现查**：条目是 profile `cordis.patch.yml` 里的 `mcp-godot`
+   （`insert`，热监听）。**判据三查**：① 文件里有 `mcp-godot` ② 进程表有
+   `node.exe … godot-mcp\build\index.js` ③ 新会话工具清单里有 `mcp__godot__*`。`GODOT_PATH` 必须是
+   `*_console.exe`，**指错不报错、只是静默没有调试输出**；路径失效则静默回落到内置默认值。
+   Godot 现装在 `D:\Program Files\Godot_v4.6.1-stable_mono_win64\`（含空格，别拼进未加引号的命令行）。
+6. **美术素材必须像素级校验，禁止目测**：`tools\art_check.mjs`（零依赖）——
+   `info` / `palette`（色距 >0.30 判偏离）/ `grid` / `watermark` / `crop`；
+   带网格的底图改锚点必须走 `grid` → 写锚点 → 截图复验三步。
+7. **沙箱拦 `user://` 的确切判据**：崩溃前必有 `Failed to open 'user://logs/godot<时间戳>.log'` +
+   `signal 11`，且无任何资源加载输出；放宽权限后同命令 exit 0 零输出。
+8. **`--script` 模式不导入新资源**：新加的图片在 `--script` 下 `ResourceLoader.exists()` 返回 **false**、
+   **静默加载失败**（贴图为 null，不报错）。判据：新资源先跑一次
+   `godot --headless --path . --import`（生成 `.import` + `.ctex`），再跑截图/测试。
+9. **`_get_drag_data()` 不能直接调**：没有真实拖拽在进行时，里面的 `set_drag_preview()` 会触发引擎断言
+   `Condition "!get_viewport()->gui_is_dragging()" is true`。判据：**把预览构造抽成独立函数**
+   （本项目 `build_drag_preview()`），测试只调它；顺带 Godot 会给 `docs\` 下的配图也生成 `.import`，
+   那些是文档图、不该进仓库。
 
-# 维护
+# 维护与导出
 
-引擎升级时（例如 4.7）：
-
-```
-git -C D:\godot-docs fetch --depth 1 origin 4.7
-git -C D:\godot-docs checkout 4.7
-```
-
-需要恢复图片时（D 盘空间紧张，谨慎）：
-
-```
-git -C D:\godot-docs sparse-checkout set --no-cone "*.rst" "*.png" "*.svg"
-```
-
-## 装导出模板（没有它就无法产出 exe）
-
-`%APPDATA%\Godot\export_templates\` 默认为**空**，`export_presets.cfg` 形同虚设。官方下载端点**可达**：
-
-```powershell
-# 版本号与 slug 要跟引擎对齐：mono 引擎要 mono_export_templates.tpz
-$u = 'https://downloads.godotengine.org/?version=4.6.1&flavor=stable&slug=mono_export_templates.tpz&platform=templates'
-Invoke-WebRequest -Uri $u -OutFile "$env:TEMP\templates.tpz"     # ≈1.09 GiB
-```
-
-装法：把 .tpz 解压出的 `templates/` 目录整个放到
-`%APPDATA%\Godot\export_templates\4.6.1.stable.mono\`。
-
-⚠️ 先确认 `slug` 与引擎口味一致——**用错口味不会报错，只会导出失败**。
+- **装导出模板**（没有它无法产出 exe）、**升级引擎切语料分支**、**恢复图片**、**网络可达性**：
+  命令与注意事项见 `DETAILS.md`「维护与导出」。
+- 要点：`%APPDATA%\Godot\export_templates\` 默认空；mono 引擎要 `mono_export_templates.tpz`；
+  **slug 与引擎口味不一致不会报错、只会导出失败**。
 
 # 源码与同步（本文件即 DSH 技能 `godot-docs` 的源）
 
-- **唯一源**：`D:\个人项目\daishu\docs\AI_PLAYBOOK.md`（本文件，受 git 版本控制）
-- **镜像**：`C:\Users\28402\.dsh\skills\godot-docs\SKILL.md` —— DSH 实际读取的技能文件。
-  它在用户目录下，**不属于任何 git 仓库**，换机器或重装 DSH 会丢，所以源放在仓库、镜像是派生物。
+- **源**（受 git 版本控制，改这里）：`docs\AI_PLAYBOOK.md`（判据，常驻）+
+  `docs\AI_PLAYBOOK-DETAILS.md`（细则，按需）
+- **镜像**（DSH 实际读取；它在用户目录下、不在任何 git 仓库里，换机器或重装 DSH 会丢）：
+  `C:\Users\28402\.dsh\skills\godot-docs\SKILL.md` + 同目录 `DETAILS.md`
 - 改完必须同步，否则 DSH 读到的仍是旧知识：
-
-```powershell
-pwsh -File tools\sync-ai-playbook.ps1          # 源 → 技能目录
-pwsh -File tools\sync-ai-playbook.ps1 -Check   # 只查漂移；不一致 exit 1
-```
+  `pwsh -File tools\sync-ai-playbook.ps1`（`-Check` 只查漂移，不一致 exit 1）
