@@ -198,6 +198,49 @@ default_font_size = 18
 判据：**动了全局字号/按钮尺寸后，必须重截所有含列表或多按钮的界面**，
 按"按钮数 × 单按钮高 + 分组标签高"估算是否装得下，别只看单个按钮好不好看。
 
+### 14. 截图工具漏初始化 → 界面"看着像游戏坏了"（2026-10-11 实测）
+
+**症状**：给项目挂上全局 Theme 后截图，代写界面左侧词库区**只剩三个分类标题**（"称谓词库/正文词库/
+落款词库"），一个词条按钮都没有。我据此判定"主题改动把词库按钮弄没了"，开始排查主题。
+
+**真相**：按钮**一直都在**。`godot` 探针打印出来是：
+
+```
+SalutationContainer  children=3  visible=true  size=(356.0, 119.0)
+    └ Button '父母大人膝下'  visible=true  size=(356.0, 37.0)  pos=(19.5, 57.0)
+```
+
+**根因**：`letter.tscn` 自身**不填充词库** —— 它靠 `main.gd` 在点击 NPC 时调用
+`letter_instance.init_with_npc(int(npc_id))` 才走 `_build_word_pools()`。
+而 `capture_scene.gd` 只是 `load().instantiate()` 就截图，**漏了这一步**，
+于是得到一张"空词库"的图。修正：截图工具对 `letter` 场景补上
+`get_today_npcs(1)` → `init_with_npc(...)`，并打印注入的 NPC 名以便确认。
+
+**判据**：① 截图/自动化工具必须**复刻真实入口的初始化调用链**（谁在什么时候调了什么）；
+② 出图看着不对时，**先怀疑工具漏步骤**，用探针打印节点数与尺寸，别直接下"游戏坏了"的结论；
+③ 这个误判方向很危险 —— 它会让人去改本来没坏的游戏代码。
+
+### 15. `--import` 未完成就断言"资源缺失"（2026-10-11 实测）
+
+**症状**：把新生成的 `button_frame.png`（九宫格贴图）复制进 `assets/images/ui/` 后，
+跑 `tools/build_theme.gd`，报 `ERROR: 按钮贴图缺失: res://assets/images/ui/button_frame.png`
+（`ResourceLoader.exists()` 返回 false）。但随后检查：`.import` 与 `.ctex` **都正常生成了**。
+
+**原因**：`--import` 是**异步**的；前一步刚发起导入、还没落盘，后一步就去问"资源在不在"。
+（另注：`--script` 模式本身根本不会触发资源导入 —— 见第 8 条。）
+
+**判据**：① 新增资源后，**先单独跑完一次** `godot --headless --path . --import`，**再**跑依赖它的脚本；
+② 看到"资源缺失"时先 `Test-Path` 核实 `.import` / `.ctex` 是否真的不存在 ——
+   若存在，那报错是**时序假象**，不是文件问题。
+
+### 16.（小）`probe_font.gd` 的同名变量 —— GDScript 不允许同一作用域重名
+
+写探针时先后声明了两个 `var miss := ""`（一个查界面用字、一个查项目用字集），
+报 `Parse Error: There is already a variable named "miss" declared in this scope.`
+GDScript 一个函数作用域内**不允许同名变量**（哪怕在不同 `if` 分支里），改名即可。
+顺带：这类"脚本解析失败"会让 `--script` **不执行也不 `quit()`**，
+表现为命令**挂住不退出** —— 所以跑探针脚本要带超时，别干等。
+
 ## 维护与导出
 
 ### 升级引擎（例如 4.7）—— 语料要跟着切分支

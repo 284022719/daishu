@@ -47,8 +47,15 @@ func _initialize() -> void:
 	print("默认字体: ", font.font_name, "  兜底: ", sys.font_names, "  字号: ", FONT_SIZE)
 
 	# ---- 按钮九宫格 ----
+	# 注意区分"文件不在"和"文件在但没导入"：`ResourceLoader.exists()` 对**未导入**的资源也返回 false，
+	# 实测刚复制进来、`--import` 还没跑完时报的就是这个 —— 别把它当成文件丢失。
+	# 见 AI_PLAYBOOK 第 15 条。
 	if not ResourceLoader.exists(BTN_TEX):
-		push_error("按钮贴图缺失: " + BTN_TEX)
+		var abs_hint := ProjectSettings.globalize_path(BTN_TEX)
+		if FileAccess.file_exists(BTN_TEX):
+			push_error("按钮贴图存在但**尚未导入**（.import/.ctex 未生成）：%s\n先跑：godot --headless --path . --import" % BTN_TEX)
+		else:
+			push_error("按钮贴图文件不存在：%s（解析为 %s）" % [BTN_TEX, abs_hint])
 		quit(1)
 		return
 	var tex := load(BTN_TEX) as Texture2D
