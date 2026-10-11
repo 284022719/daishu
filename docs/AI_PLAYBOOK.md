@@ -7,10 +7,8 @@ whenToUse: 任务涉及 Godot 引擎 / GDScript / 场景 / 节点 / 信号 / 资
 # 语料（第一依据 —— 别凭记忆写 API）
 
 - `D:\个人项目\daishu\godot-docs`：gitcode 镜像的 godot-docs 仓库，**4.6 分支**（HEAD `b10b7ed`），
-  纯文本稀疏检出 1568 篇 `.rst`。
-  **2026-10-11 从 `D:\godot-docs` 迁入本项目目录**（见下方「语料的边界」）。
-- **版本锚点 4.6**：本机引擎 v4.6.1-stable (mono) 与文档同代。图片与动图**未检出**，正文里的图片链接指向
-  `raw.githubusercontent.com`（本机访问不了）—— **不要追图片**。
+  纯文本稀疏检出 1568 篇 `.rst`。**版本锚点 4.6**（本机引擎 v4.6.1-stable mono 同代）；
+  图片与动图**未检出**，正文里的图片链接指向本机访问不了的 `raw.githubusercontent.com` —— **不要追图片**。
 - **语料的边界（2026-10-11 实测）**：它是 `blob:none` 的**部分克隆** —— **只能查文档，不能切分支/回滚**
   （`git checkout` 会去 gitcode.com 取 blob，本机代理拦 403、报 `could not fetch … from promisor remote`）。
   机制、恢复图片与切分支的做法见 `DETAILS.md`「语料的边界」。
@@ -22,12 +20,12 @@ whenToUse: 任务涉及 Godot 引擎 / GDScript / 场景 / 节点 / 信号 / 资
 | 类参考（属性 / 方法 / 信号 / 枚举 / 常量） | `classes\class_<小写类名>.rst`：`Node2D`→`class_node2d.rst`、`HTTPRequest`→`class_httprequest.rst` |
 | GDScript 语言本身（语法、类型、注解） | `classes\class_@gdscript.rst` |
 | 全局函数与单例（`print` / `load` / `Input` / `Engine`…） | `classes\class_@globalscope.rst` |
-| 教程与最佳实践 | `tutorials\<主题>\`：2d 3d animation assets_pipeline audio best_practices editor export i18n inputs io math migrating navigation networking performance physics platform plugins rendering scripting shaders ui xr |
+| 教程与最佳实践 | `tutorials\<主题>\` —— 24 个主题目录的清单见 `DETAILS.md`「目录地图」 |
 | 入门 / 引擎内部机制 | `getting_started\` / `engine_details\` |
 
 # 检索配方
 
-用 DSH 的 `grep` / `glob` / `read` 工具；**本机 shell 里没有 `rg`**，别在 pwsh 里拼 ripgrep。
+用 DSH 的 `grep` / `glob` / `read`；**本机 shell 里没有 `rg`**，别在 pwsh 里拼 ripgrep。
 
 1. **查某个类**：先 `grep` 定位行号，再 `read` 该片段（类文件通常 300–3000 行）：
    `grep pattern="move_and_slide|position" path=D:\个人项目\daishu\godot-docs\classes\class_characterbody2d.rst`
@@ -37,10 +35,7 @@ whenToUse: 任务涉及 Godot 引擎 / GDScript / 场景 / 节点 / 信号 / 资
    `signal`/`property` 即可反查信号与属性。
 3. **查主题做法**（拖放 / 存档 / 相机跟随 / 状态机）：
    `grep pattern="drag and drop" path=D:\个人项目\daishu\godot-docs\tutorials`，命中后读对应 rst。
-4. **查废弃与版本迁移**：`grep pattern="deprecated|removed in 4\." path=D:\个人项目\daishu\godot-docs\tutorials\migrating`。
-
-**类参考结构**：顶部 `Properties`/`Methods` 总览表最快判断"这个类到底有没有这个能力"；
-锚点写法（`.. _class_X_method_y:`）、`:ref:` 反查与章节顺序见 `DETAILS.md`「类参考结构」。
+4. **查废弃与版本迁移**、**类参考结构**（锚点写法 / 章节顺序 / 总览表）：见 `DETAILS.md`。
 
 # 纪律
 
@@ -48,10 +43,9 @@ whenToUse: 任务涉及 Godot 引擎 / GDScript / 场景 / 节点 / 信号 / 资
   **不要拿 3.x 的旧记忆补齐**。
 - 本项目是 4.x：留意 `@export` 注解写法、`Tween`、`Callable`、`Node.owner` 语义、单例访问方式；
   文档里标 `deprecated` 的一律不用。
-- **可以联网，但第一依据仍是本地语料**（它锚定 4.6，官网 `/en/stable/` 未必是 4.6）：
-  `web_fetch` 工具存在（2026-10-10 复测，推翻 2026-09 的旧结论），`docs.godotengine.org` 实测 HTTP 200。
-  只在①本地语料确实没有 ②核对某条 API 在 4.6 之后是否变更 时用；引用官网时要说明它可能不是 4.6。
-- 拿不准就是在猜。宁可多读一篇 rst，也不要写一个没出处的 API。
+- **可以联网，但第一依据仍是本地语料**（它锚定 4.6，官网 `/en/stable/` 未必是 4.6）：`web_fetch` 可用、
+  `docs.godotengine.org` 实测 200；只在①本地语料确实没有 ②核对某条 API 在 4.6 之后是否变更时用，
+  引用官网要说明它可能不是 4.6。
 
 # 项目文档地图（代书，`D:\个人项目\daishu`）
 
@@ -64,10 +58,8 @@ whenToUse: 任务涉及 Godot 引擎 / GDScript / 场景 / 节点 / 信号 / 资
 | 场景节点树与信号连接 | `docs\SCENE_OVERVIEW.md` |
 | NPC 字典 / 存档 / 玩家答案字段 | `docs\DATA_FORMATS.md`、`docs\NPC_GENERATION.md` |
 | 判定计费逻辑 | `docs\JUDGE_SYSTEM_LOGIC.md` |
-| 平衡数值与模拟结论 | `docs\BALANCE_REPORT.md` |
-| 开发路线图与已知风险 | `docs\DEV_PLAN.md` |
-| 美术方向 / 色板 / 生成提示词 | `docs\ART_PLAN.md`、`docs\ART_BASELINE_ROUND1.md` |
-| 美术素材校验工具 + 提示词 JSON | `tools\art_check.mjs`、`data\art_prompts_round*.json` |
+| 平衡数值 / 路线图与已知风险 | `docs\BALANCE_REPORT.md`、`docs\DEV_PLAN.md` |
+| 美术方向 / 色板 / 生成提示词 / 素材校验 | `docs\ART_PLAN.md`、`docs\ART_BASELINE_ROUND1.md`、`tools\art_check.mjs` |
 | 给 AI 助手的项目约定 | `CLAUDE.md` |
 
 **代码为准**：文档与实现冲突时以实际实现为准（`docs\readme.md` 曾长期滞后，2026-09 校正过一次），
@@ -77,47 +69,43 @@ whenToUse: 任务涉及 Godot 引擎 / GDScript / 场景 / 节点 / 信号 / 资
 
 > 完整场景、命令与数字见 `DETAILS.md`「本机踩坑（完整版）」。这里只留"该怎么判"。
 
-1. **`godot --check-only --script` 不注册 autoload** → 引用单例的脚本一律报 `Identifier not found`，
-   **是假阳性**。判据：拿一个没动过、同样引用单例的脚本做对照组（全报＝模式问题）。
+1. **`godot --check-only --script` 不注册 autoload** → 引用单例的脚本一律报 `Identifier not found`，**是假阳性**。
+   判据：拿一个没动过、同样引用单例的脚本做对照组（全报＝模式问题）。
 2. **整数除法警告**：`int(a / b)` 里的 `int()` 多余且消不掉警告，改用 `floori(a / b.0)`（负数语义不同）；
    该警告只在运行时出现，headless 看不到。
 3. **Godot 段错误先怀疑文件权限**：沙箱拦 `user://` 写入时崩在项目加载**之前**（`--check-only` 也崩、
    `--verbose` 无任何资源加载输出）—— 是环境问题，不是代码问题。
 4. **`unique_id=` 是 4.6 新语法**（`load_steps` 已废弃）—— 别当错误去"修"。
-5. **godot-mcp 接线会"自己消失"，状态必须现查**（条目在 profile `cordis.patch.yml`）。**判据三查**：
-   ① 文件里有 `mcp-godot` ② 进程表有 `node.exe … godot-mcp\build\index.js` ③ 新会话工具清单里有 `mcp__godot__*`。
-   `GODOT_PATH` 必须是 `*_console.exe`（**指错不报错、只是静默没有调试输出**；路径失效会静默回落到内置默认值，
-   症状是 `spawn … ENOENT`）。Godot 装在 `D:\Program Files\Godot_v4.6.1-stable_mono_win64\`（含空格，别拼进未加引号的命令行）。
-6. **美术素材必须像素级校验，禁止目测**：`tools\art_check.mjs`（零依赖）——
-   `info` / `palette`（色距 >0.30 判偏离）/ `grid` / `watermark` / `crop`；
-   带网格的底图改锚点必须走 `grid` → 写锚点 → 截图复验三步。
-7. **沙箱拦 `user://` 的确切判据**：崩溃前必有 `Failed to open 'user://logs/godot<时间戳>.log'` +
-   `signal 11`，且无任何资源加载输出；放宽权限后同命令 exit 0 零输出。
+5. **godot-mcp 接线会"自己消失"，状态必须现查**。**判据三查**：① `cordis.patch.yml` 里有 `mcp-godot`
+   ② 进程表有 `node.exe … godot-mcp\build\index.js` ③ 新会话工具清单里有 `mcp__godot__*`。
+   `GODOT_PATH` 必须指 `*_console.exe`（**指错不报错、只是静默没有调试输出**；路径失效会静默回落到内置
+   默认值，症状是 `spawn … ENOENT`）。console exe 的完整路径见 `DETAILS.md` 第 5 条。
+6. **美术素材必须像素级校验，禁止目测**：`tools\art_check.mjs`（零依赖）—— `info` / `palette`（色距 >0.30 判偏离）/
+   `grid` / `watermark` / `crop`；带网格的底图改锚点必须走 `grid` → 写锚点 → 截图复验三步。
+7. **沙箱拦 `user://` 的确切判据**：崩溃前必有 `Failed to open 'user://logs/godot<时间戳>.log'` + `signal 11`，
+   且无任何资源加载输出；放宽权限后同命令 exit 0 零输出。
 8. **`--script` 模式不导入新资源**：新加的图片在 `--script` 下 `ResourceLoader.exists()` 返回 **false**、
-   **静默加载失败**（贴图为 null，不报错）。判据：新资源先跑一次
-   `godot --headless --path . --import`（生成 `.import` + `.ctex`），再跑截图/测试。
+   **静默加载失败**（贴图为 null，不报错）。判据：新资源先跑一次 `godot --headless --path . --import`，再跑测试。
 9. **`_get_drag_data()` 不能直接调**：无真实拖拽时 `set_drag_preview()` 触发引擎断言
-   `!get_viewport()->gui_is_dragging()`。判据：**预览构造抽成独立函数**（本项目 `build_drag_preview()`）只调它；
-   另：Godot 会给 `docs\` 配图生成 `.import`，那些是文档图、不该进仓库。
+   `!get_viewport()->gui_is_dragging()`。判据：**预览构造抽成独立函数**（本项目 `build_drag_preview()`）只调它。
 10. **`.tres` 里 stylebox 的键名别手写，让引擎写**：手写 `Button/styles/normal` 这类键猜错会**静默失效**
-    （主题挂上了却没样式）。判据：用代码建 `Theme` 再 `ResourceSaver.save()`；**改完立即 `load()` 回读会命中
+    （主题挂上了却没样式）。判据：代码建 `Theme` 再 `ResourceSaver.save()`；**改完立即 `load()` 回读会命中
     写入前的缓存**，回读要**读文件文本**，语义校验另起进程。
 11. **`Font.fallbacks` 不会进 `.tres`，Godot 也不会自动回退系统字体** —— **只能运行时挂**（本项目
     `scripts/FontFallback.gd` 自启动）。判据：拿一个**主字体确实没有**的字符渲染一张图看是不是方块；
     挂了兜底后字体是 `FontVariation`，取名字要用 `.base_font.font_name`。
-12. **命令行 `--resolution` 会连同视口一起改，截图会被缩放**（实测要 `900x260` 出图只有 `462x260`），
-    拿它当像素依据会得出错误结论。判据：截图工具自己设窗口尺寸，**写完图断言尺寸**，不符就报错。
-13. **全局 Theme 的字号会改变布局、撑破容器**（实测字号 20 时 15 个词库按钮撑出面板）。
-    判据：**换全局字号后必须重截所有用了列表/多按钮的界面**，并按"按钮数 × 单按钮高"估算是否装得下。
-14. **截图工具漏了初始化步骤时，界面会"看着像游戏坏了"**（本项目词库空白，差点误判成主题改动所致）。
+12. **命令行 `--resolution` 会连同视口一起改，截图会被缩放**，拿它当像素依据会得出错误结论。
+    判据：截图工具自己设窗口尺寸，**写完图断言尺寸**，不符就报错。
+13. **全局 Theme 的字号会改变布局、撑破容器**。
+    判据：**换全局字号后必须重截所有用了列表/多按钮的界面**，按"按钮数 × 单按钮高"估算是否装得下。
+14. **截图工具漏了初始化步骤时，界面会"看着像游戏坏了"**。
     判据：**截图/自动化工具要复刻真实入口的初始化调用链**；出图不对先用探针打印**节点数与尺寸**再下结论。
 15. **`--import` 是异步的**：它还没写完就去 `ResourceLoader.exists()` 会得到"资源缺失"的假象。
     判据：**新增资源后先单独跑完一次 `--import`**，再跑依赖它的脚本；报缺失时先 `Test-Path` 核实
     `.import`/`.ctex` 是否真的不在（`--script` 模式根本不会触发导入 —— 见第 8 条）。
 16. （小）**GDScript 同作用域不允许变量重名**（哪怕在不同 `if` 分支），报 `There is already a variable
-    named …`；这类**解析失败会让 `--script` 既不执行也不 `quit()`**（命令挂住不退出），跑探针脚本要带超时。
-17. **改了图片内容但尺寸/字节数没变时，Godot 不会重新导入**（实测"裁掉底带再缩回原尺寸"：尺寸与字节数
-    都相同 → `--import` 报"无错误"、`.ctex` 仍是旧像素）。判据：**同尺寸改写图片后删掉
+    named …`；这类**解析失败会让 `--script` 既不执行也不 `quit()`**（命令挂住不退出），跑探针要带超时。
+17. **改了图片内容但尺寸/字节数没变时，Godot 不会重新导入**。判据：**同尺寸改写图片后删掉
     `.godot/imported/<图>-<哈希>.ctex` 与 `.md5` 再 `--import`**；验证要落到"渲染出来的图变了没有"。
 18. **改 Markdown 章节后必须跑结构守卫，别靠眼睛**：**拿"标题行"当 edit 锚点**最容易漏写回旧标题，
     正文就成了"挂在上一节下面"的孤儿（内容都在，肉眼看着正常）。判据：**`node tools/md_structure_check.mjs

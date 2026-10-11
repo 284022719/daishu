@@ -6,6 +6,49 @@
 >
 > 两个文件同源、同镜像：改完都要跑 `tools\sync-ai-playbook.ps1`。
 
+## 语料的边界（`blob:none` 部分克隆）
+
+`D:\个人项目\daishu\godot-docs` 是 **2026-10-11 从 `D:\godot-docs` 迁入**的、gitcode 镜像的 godot-docs
+仓库 4.6 分支（HEAD `b10b7ed`），纯文本稀疏检出 1568 篇 `.rst`。它是一个 `blob:none` 的**部分克隆**：
+本地只有那个提交的树，**没有 blob 对象**。`git status` / `git checkout` 会去 gitcode.com 取 blob，
+而本机代理拦 403 → 报 `could not fetch … from promisor remote`。所以它现在是**只读的纯文本语料**：
+**拿它查文档可以，拿它切分支/回滚不行**（要切分支得先能连通 gitcode，或改用"重新克隆到新目录"）。
+切分支与恢复图片的命令见本文件「维护与导出」。
+
+## 目录地图（`tutorials\` 的 24 个主题目录）
+
+`2d` `3d` `animation` `assets_pipeline` `audio` `best_practices` `editor` `export` `i18n` `inputs` `io`
+`math` `migrating` `navigation` `networking` `performance` `physics` `platform` `plugins` `rendering`
+`scripting` `shaders` `ui` `xr`
+
+## 类参考结构（检索时看）
+
+- 每个条目形如：`.. _class_Node2D_method_apply_scale:` + `|void| **apply_scale**(…)`。
+- `:ref:`X<class_X>`` 括号里的类型名（转小写）就是下一个能查的文件名。
+- 章节顺序：Description → Properties → Methods → Signals → Enumerations → Constants。
+- 顶部 `Properties`/`Methods` 两张总览表用来快速判断"这个类到底有没有这个能力"。
+
+## 检索配方（第 4 条：废弃与版本迁移）
+
+```powershell
+grep pattern="deprecated|removed in 4\." path=D:\个人项目\daishu\godot-docs\tutorials\migrating
+```
+
+## 项目文档地图（完整）
+
+| 要查什么 | 去哪 |
+|---|---|
+| 总览 / API 摘要 / 判定规则 | `docs\readme.md` |
+| 三单例职责与依赖关系 | `docs\ARCHITECTURE_SINGLETONS.md`、`docs\SINGLETON_APIS.md` |
+| 场景节点树与信号连接 | `docs\SCENE_OVERVIEW.md` |
+| NPC 字典 / 存档 / 玩家答案字段 | `docs\DATA_FORMATS.md`、`docs\NPC_GENERATION.md` |
+| 判定计费逻辑 | `docs\JUDGE_SYSTEM_LOGIC.md` |
+| 平衡数值与模拟结论 | `docs\BALANCE_REPORT.md` |
+| 开发路线图与已知风险 | `docs\DEV_PLAN.md` |
+| 美术方向 / 色板 / 生成提示词 | `docs\ART_PLAN.md`、`docs\ART_BASELINE_ROUND1.md` |
+| 美术素材校验工具 + 提示词 JSON | `tools\art_check.mjs`、`data\art_prompts_round*.json` |
+| 给 AI 助手的项目约定 | `CLAUDE.md` |
+
 ## 本机踩坑（完整版）
 
 ### 1. `godot --check-only --script` 不注册 autoload
@@ -304,3 +347,12 @@ Invoke-WebRequest -Uri $u -OutFile "$env:TEMP\templates.tpz"     # ≈1.09 GiB
 
 > 注意区分：`web_fetch`（宿主工具，不受 `rules.yaml` 代理约束）与 shell 里的 `Invoke-WebRequest`
 > （走白名单代理，未列出即 403）是两条路。抓网页优先用 `web_fetch`。
+
+## 源码与同步
+
+- **源**（受 git 版本控制，改这里）：`docs\AI_PLAYBOOK.md`（判据，常驻）+
+  `docs\AI_PLAYBOOK-DETAILS.md`（细则，按需）—— 两者都在 daishu 仓库里。
+- **镜像**（DSH 实际读取的那份）：`C:\Users\28402\.dsh\skills\godot-docs\SKILL.md` + 同目录 `DETAILS.md`。
+  它在用户目录下、**不在任何 git 仓库里**，换机器或重装 DSH 会丢 —— 所以"源"才是权威。
+- **为什么必须同步**：DSH 只读镜像；不去同步，会话里拿到的仍是旧知识（改了源也白改）。
+  `pwsh -File tools\sync-ai-playbook.ps1` 写入镜像并留 `.bak`；`-Check` 只查漂移（不一致 exit 1）。
