@@ -127,6 +127,77 @@ SCRIPT ERROR: Invalid call. Nonexistent function 'gui_get_drag_preview' in base 
 `_get_drag_data()` 只负责组装数据 + 调它；测试改调 `build_drag_preview()`，
 即可在**不触发拖拽引擎**的前提下断言"预览里有毛笔贴图 + 词文本"。
 
+### 10. 全局 Theme：`.tres` 键名让引擎写，回读别信同进程缓存（2026-10-11 实测）
+
+**背景**：给项目加全局主题（`theme/daishu_theme.tres`，中文字体 + 按钮九宫格）。
+
+**坑一：`.tres` 里 stylebox 的键名不要手写。** 本地语料翻遍了没有 `.tres` 的序列化示例，
+`Button/styles/normal` 这类键写错会**静默失效** —— 主题文件挂上了、控件却没有样式，不报错。
+做法：写 `tools/build_theme.gd`，用 `Theme.new()` + `set_stylebox()/set_color()/set_font()` 构建，
+再 `ResourceSaver.save(theme, "res://theme/daishu_theme.tres")`。引擎实际写出的是：
+
+```
+Button/styles/normal = SubResource("StyleBoxTexture_…")
+Button/colors/font_color = Color(0.235, 0.176, 0.098, 1)
+Label/colors/font_color  = Color(0.235, 0.176, 0.098, 1)
+Panel/styles/panel       = SubResource("StyleBoxFlat_…")
+default_font = ExtResource("…")     ← FontFile 时；挂了兜底后是 SubResource(FontVariation)
+default_font_size = 18
+```
+
+**坑二：同一进程内 `load()` 回读会命中写入前的缓存。** 刚 `ResourceSaver.save()` 完立刻
+`load(OUT_PATH)` 做回读校验，`default_font_size` 读到的仍是**上一版**的值（实测：文件里是 18，
+同进程 load 回 20），于是校验报"失败" —— 而文件其实是对的。
+判据：**回读校验读文件文本**（`FileAccess.get_file_as_string` + `contains`），
+语义层面的校验（控件实际取到什么样式）交给**另起一个进程**的 `tools/verify_theme.gd`。
+
+**坑三：挂了兜底后字体类型会变。** `FontVariation` **没有 `font_name` 属性**，
+直接读会 `Invalid access to property or key 'font_name' on a base object of type 'FontVariation'`，
+要取 `.base_font.font_name`。
+
+### 11. `Font.fallbacks` 不进 `.tres`，且 Godot 不会自动回退系统字体（2026-10-11 实测）
+
+想给主题字体挂系统字体兜底链，试了两种写法，**存盘再 load 回来 fallbacks 数量都是 0**：
+
+- 直接 `fontFile.fallbacks = [sys]`
+- 包一层 `FontVariation`（`base_font = fontFile; fallbacks = [sys]`）再赋给 `theme.default_font`
+
+结论：**`Font.fallbacks` 不会被序列化**，只能在运行时挂 —— 本项目落到 `scripts/FontFallback.gd`
+（自启动，`_ready()` 里查 `ThemeDB.get_project_theme()`，给 `default_font` 包 `FontVariation` 并挂
+`SystemFont(["Microsoft YaHei", "SimSun", "Noto Sans CJK SC", "sans-serif"])`）。
+实测自启动生效：`[FontFallback] 已挂兜底: […] 实际 fallbacks=1`。
+
+**为什么需要兜底（顺带否掉一个常见假设）**：**Godot 不会自动回退到系统字体**。
+用 `tools/render_font_sample.gd` 把"项目内用字"与"项目外用字"分两行渲染成图对照：
+项目外用字（龘靐齉爩…）在该字体下**渲染成了密集方块**，加了兜底链才出现笔画。
+
+**字体决策依据（值得复用）**：不要看字体的 CJK 总覆盖率 —— `hanchanlongcang.otf` 只有 32.4%
+（6770/20902），但项目**实际用字**（从 scripts+scenes 提取并去重）只有 594 个，实测 **0 缺字**。
+判据：**先量项目自己的用字集，再拿它去撞字体覆盖**（`Font.has_char(cp)`）。
+顺带：`maobi0.ttf` 实测 0% 覆盖（Godot 报字体名 `RS_XingKai` 却没有任何字形），
+`ChillHuoKai_Regular.otf` 48.7% —— 体量与实际内容不符，别按文件名判断。
+
+### 12. 命令行 `--resolution` 会连视口一起改，截图被缩放（2026-10-11 实测）
+
+`godot --resolution 900x260 --script tools/capture_scene.gd` 明明设了
+`get_root().size = Vector2i(1152, 648)`，出图却只有 **462×260**（≈0.40 倍）。
+原因：`--resolution` 设置的是**游戏视口**尺寸，而窗口是 1152×648，于是画面被缩放后再截图。
+
+**危害**：这类图**看起来正常**（只是小），拿它做像素级判断会得出错误结论 ——
+本次就一度据此误判"词库按钮没渲染出来"，放大后才发现按钮一直都在、只是被缩小糊掉了。
+
+判据：截图工具**自己设窗口尺寸**（`DisplayServer.window_set_size()` + `get_root().size`），
+**不传 `--resolution`**，并在写图后**断言 `img.get_width()/get_height()` 等于设计分辨率**，不符即报错退出。
+
+### 13. 全局 Theme 的字号会撑破列表容器（2026-10-11 实测）
+
+把全局字号设成 20、按钮 `StyleBoxTexture` 内容边距设成 8 之后，代写界面左侧面板里
+15 个词库按钮（3 称谓 + 3×3 正文 + 3 落款）**总高超出面板，底部两颗被裁掉**。
+
+修法：字号降到 18，内容边距改为**上下 4 / 左右 10**（内容边距比贴图边距 12 小）。
+判据：**动了全局字号/按钮尺寸后，必须重截所有含列表或多按钮的界面**，
+按"按钮数 × 单按钮高 + 分组标签高"估算是否装得下，别只看单个按钮好不好看。
+
 ## 维护与导出
 
 ### 升级引擎（例如 4.7）—— 语料要跟着切分支

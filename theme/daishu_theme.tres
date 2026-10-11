@@ -1,0 +1,90 @@
+[gd_resource type="Theme" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/images/ui/button_frame.png" id="1_v6tjr"]
+[ext_resource type="FontFile" path="res://assets/fonts/hanchanlongcang.otf" id="2_yvk68"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_v6tjr"]
+content_margin_left = 10.0
+content_margin_top = 4.0
+content_margin_right = 10.0
+content_margin_bottom = 4.0
+texture = ExtResource("1_v6tjr")
+texture_margin_left = 12.0
+texture_margin_top = 12.0
+texture_margin_right = 12.0
+texture_margin_bottom = 12.0
+modulate_color = Color(0.8, 0.8, 0.8, 0.7)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_yvk68"]
+content_margin_left = 10.0
+content_margin_top = 4.0
+content_margin_right = 10.0
+content_margin_bottom = 4.0
+texture = ExtResource("1_v6tjr")
+texture_margin_left = 12.0
+texture_margin_top = 12.0
+texture_margin_right = 12.0
+texture_margin_bottom = 12.0
+modulate_color = Color(1.06, 1.04, 0.98, 1)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_lkgx7"]
+content_margin_left = 10.0
+content_margin_top = 4.0
+content_margin_right = 10.0
+content_margin_bottom = 4.0
+texture = ExtResource("1_v6tjr")
+texture_margin_left = 12.0
+texture_margin_top = 12.0
+texture_margin_right = 12.0
+texture_margin_bottom = 12.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_ilbkc"]
+content_margin_left = 10.0
+content_margin_top = 4.0
+content_margin_right = 10.0
+content_margin_bottom = 4.0
+texture = ExtResource("1_v6tjr")
+texture_margin_left = 12.0
+texture_margin_top = 12.0
+texture_margin_right = 12.0
+texture_margin_bottom = 12.0
+modulate_color = Color(0.9, 0.86, 0.78, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_smu32"]
+content_margin_left = 10.0
+content_margin_top = 10.0
+content_margin_right = 10.0
+content_margin_bottom = 10.0
+bg_color = Color(0.965, 0.933, 0.867, 0.92)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.549, 0.322, 0.141, 0.5)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="SystemFont" id="SystemFont_sof4h"]
+font_names = PackedStringArray("Microsoft YaHei", "SimSun", "Noto Sans CJK SC", "sans-serif")
+
+[sub_resource type="FontVariation" id="FontVariation_a6ghd"]
+fallbacks = Array[Font]([SubResource("SystemFont_sof4h")])
+base_font = ExtResource("2_yvk68")
+
+[resource]
+default_font = SubResource("FontVariation_a6ghd")
+default_font_size = 18
+Button/colors/font_color = Color(0.235, 0.176, 0.098, 1)
+Button/colors/font_disabled_color = Color(0.5, 0.48, 0.45, 0.7)
+Button/colors/font_focus_color = Color(0.235, 0.176, 0.098, 1)
+Button/colors/font_hover_color = Color(0.549, 0.322, 0.141, 1)
+Button/colors/font_pressed_color = Color(0.235, 0.176, 0.098, 1)
+Button/styles/disabled = SubResource("StyleBoxTexture_v6tjr")
+Button/styles/focus = SubResource("StyleBoxTexture_yvk68")
+Button/styles/hover = SubResource("StyleBoxTexture_yvk68")
+Button/styles/normal = SubResource("StyleBoxTexture_lkgx7")
+Button/styles/pressed = SubResource("StyleBoxTexture_ilbkc")
+Label/colors/font_color = Color(0.235, 0.176, 0.098, 1)
+Panel/styles/panel = SubResource("StyleBoxFlat_smu32")

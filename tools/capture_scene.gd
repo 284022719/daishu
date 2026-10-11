@@ -38,7 +38,15 @@ func _initialize() -> void:
 		quit(1)
 		return
 
-	get_root().size = Vector2i(1152, 648)
+	# 显式把窗口设到设计分辨率。
+	# 注意：命令行 `--resolution` 会把**视口**一起改掉，导致截图被缩放
+	# （实测给 900x260 时出图只有 462x260 —— 游戏视口被设成 900x260 而窗口是 1152x648）。
+	# 所以这里不依赖 --resolution，自己设窗口尺寸，并在写图后断言像素尺寸。
+	const DESIGN := Vector2i(1152, 648)
+	DisplayServer.window_set_size(DESIGN)
+	get_root().size = DESIGN
+	for i in range(3):
+		await process_frame
 
 	var packed: PackedScene = load(SCENES[scene_key])
 	if packed == null:
@@ -49,6 +57,23 @@ func _initialize() -> void:
 	get_root().add_child(scene)
 	for i in range(4):
 		await process_frame
+
+	# letter 场景需要注入一个 NPC 才会填充词库（否则左侧词库是空的 —— 这是本工具的坑，
+	# 不是游戏问题：场景本身靠 main.gd 调用 init_with_npc 才初始化）
+	if scene_key == "letter":
+		var npc_manager: Node = get_root().get_node_or_null("NPCManager")
+		if npc_manager == null:
+			print("[capture] 找不到 NPCManager，词库将为空")
+		else:
+			var npcs: Array = npc_manager.get_today_npcs(1)
+			if npcs.is_empty():
+				print("[capture] 没有生成 NPC，词库将为空")
+			else:
+				var npc: Dictionary = npcs[0]
+				scene.init_with_npc(int(npc.get("npc_id", 0)))
+				print("[capture] 注入 NPC: ", npc.get("name", "?"), "（", npc.get("letter_type", "?"), "）")
+				for i in range(4):
+					await process_frame
 
 	# 可选：点一次按钮（用于触发列表填充等交互后再截图）
 	if not click_name.is_empty():
@@ -73,6 +98,12 @@ func _initialize() -> void:
 		return
 	img.save_png(out_path)
 	print("[capture] 已保存 ", out_path, "  ", img.get_width(), "x", img.get_height())
+	# 自检：尺寸必须是设计分辨率，否则截图被缩放过、不能当像素级依据
+	if img.get_width() != DESIGN.x or img.get_height() != DESIGN.y:
+		push_error("截图尺寸 %dx%d 与设计分辨率 %dx%d 不符（说明视口被缩放，别拿它做像素判断）"
+			% [img.get_width(), img.get_height(), DESIGN.x, DESIGN.y])
+		quit(1)
+		return
 	quit(0)
 
 func _find_node_by_name(root: Node, target: String) -> Node:

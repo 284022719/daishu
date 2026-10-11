@@ -104,6 +104,20 @@ Description → Properties → Methods → Signals → Enumerations → Constant
    `Condition "!get_viewport()->gui_is_dragging()" is true`。判据：**把预览构造抽成独立函数**
    （本项目 `build_drag_preview()`），测试只调它；顺带 Godot 会给 `docs\` 下的配图也生成 `.import`，
    那些是文档图、不该进仓库。
+10. **`.tres` 里 stylebox 的键名别手写，让引擎写**：本地语料没有 `.tres` 示例，手写 `Button/styles/normal`
+    这类键猜错会**静默失效**（主题挂上了却没样式）。判据：用代码建 `Theme` 再 `ResourceSaver.save()`；
+    方向反过来时——**改完立即 `load()` 回读会命中写入前的缓存**（实测 `default_font_size` 读到上一版），
+    回读要**读文件文本**，语义校验另起一个进程。
+11. **`Font.fallbacks` 不会进 `.tres`，且 Godot 不会自动回退系统字体**：赋在 `FontFile` 上或包一层
+    `FontVariation` 都一样，存盘再 load 回来都是 0 条 —— **只能运行时挂**（本项目 `scripts/FontFallback.gd`
+    自启动）。判据：拿一个**主字体确实没有**的字符渲染一张图看是不是方块（实测项目外用字确实渲染成方块）。
+    另：挂了兜底后字体变成 `FontVariation`，它**没有 `font_name`**，要取 `.base_font.font_name`。
+12. **命令行 `--resolution` 会连同视口一起改，截图会被缩放**：实测给 `900x260` 时出图只有 `462x260`
+    （约 0.40 倍），而拿它当像素依据会得出错误结论。判据：截图工具自己 `DisplayServer.window_set_size()`
+    + `get_root().size`，**写完图断言尺寸**，不符就报错而不是静默产出。
+13. **全局 Theme 的字号会改变布局、撑破容器**：实测字号 20 + 内容边距 8 时，代写界面左侧 15 个词库按钮
+    撑出面板、底部被裁。判据：**换全局字号后必须重截所有用了列表/多按钮的界面**，
+    并按"按钮数 × 单按钮高"估算是否装得下。
 
 # 维护与导出
 

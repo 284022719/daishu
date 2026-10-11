@@ -20,17 +20,25 @@ config/features=PackedStringArray("4.6")
 
 [autoload]
 
+FontFallback="*res://scripts/FontFallback.gd"
 NPCManager="*res://scripts/NPCManager.gd"
 JudgeSystem="*res://scripts/JudgeSystem.gd"
 PlayerManager="*res://scripts/PlayerManager.gd"
 
 [display]
 
+; 显式声明视口尺寸（原为隐式吃默认 1152x648，而信纸槽位对齐依赖它）
+window/size/viewport_width=1152
+window/size/viewport_height=648
 window/stretch/mode="canvas_items"
 
 [dotnet]
 
 project/assembly_name="daishu"
+
+[gui]
+
+theme/custom="res://theme/daishu_theme.tres"
 
 [rendering]
 

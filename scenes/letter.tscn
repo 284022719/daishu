@@ -35,6 +35,22 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_requestlabel"]
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+bg_color = Color(1, 0.984, 0.937, 0.82)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.667, 0.478, 0.227, 0.45)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
 [node name="Letter" type="Control" unique_id=1343437158]
 layout_mode = 3
 anchors_preset = 15
@@ -136,6 +152,7 @@ theme_override_constants/separation = 12
 
 [node name="RequestLabel" type="Label" parent="HSplit/LetterPanel/LetterVBox" unique_id=2034702877]
 layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_requestlabel")
 text = "（口述内容）"
 
 [node name="PaperArea" type="Control" parent="." unique_id=98025117]

@@ -10,6 +10,7 @@ godot-docs/
 # 给 tools\*.gd 重新生成 .uid）—— 都不是源码，别进仓库
 docs/screenshots/*.import
 tools/*.uid
+scripts/*.uid
 
 # Godot 导出产物（构建输出，不进版本控制）
 export/
