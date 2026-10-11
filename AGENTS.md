@@ -1,10 +1,248 @@
-# D:\个人项目\daishu —— 代书（Godot 4.x）工作区约定
+# 《代书》(Daishu) —— 工作区规则与项目约定
 
-> 本层只放**这个项目专属**的约定。跨工作区的东西在 `~\.dsh\AGENTS.md`；
-> 下面第一条是 2026-10-12 从那里**下移**过来的 —— 它只对 Godot 项目成立，不该占每个会话的常驻预算。
+> **这是本项目所有规则的唯一入口。** 在本目录下工作时，先读本文件。
+>
+> - 跨工作区的通用约定在 `~\.dsh\AGENTS.md`，本文件在其后生效、**优先级更高**。
+> - 本文件由工作区的 `AGENTS.md` + 原 `CLAUDE.md` **合并而成（2026-10-12）**。
+>   `CLAUDE.md` 里的规则已全部并入下文，该文件现在只留一个指向本文件的指针，**规则只在这里维护**。
+> - 冲突裁决：本文件内部前后矛盾 → 以**后写的**为准；与 `docs\` 下的设计文档冲突 → 以**有实测依据的**为准；
+>   若两者都无实测，**先跑一次验证再下结论**（见第 8 节）。
 
-- **写或审 GDScript 前先走 `godot-docs` 技能**：本地 Godot 4.6 语料（类参考 + 教程）是**第一依据**，
-  不要凭记忆写 API；断言 API 必须给出处（`classes\class_xxx.rst` + 行号），查不到就直说"文档里没有"。
-- **项目自己的约定与文档地图**见 `CLAUDE.md`（含美术硬规矩、目录结构、AI playbook 的位置）；
-  技能判据的**源**是 `docs\AI_PLAYBOOK.md`，改完必须跑 `tools\sync-ai-playbook.ps1` 同步镜像
-  （DSH 读的是 `~\.dsh\skills\godot-docs\`，`-Check` 只查漂移）。
+---
+
+## 1. 技能与查证（写代码前）
+
+- **写或审 GDScript / 场景 / 节点 / 信号 / 资源前，先走 `godot-docs` 技能。**
+  本地 Godot 4.6 语料（类参考 1066 篇 + 教程）是**第一依据**，不要凭记忆写 API。
+- **断言 API 必须给出处**：`godot-docs\classes\class_xxx.rst` + 行号。**查不到就直说"文档里没有"**，
+  不要用回忆补全签名（本会话实测踩过：`Image.resize` 我以为是返回 `Error`，实际是 `void`）。
+- 语料在 `godot-docs\`（已 gitignore，36 MB）。**它是 `blob:none` 部分克隆**：本地没有 blob 对象，
+  `git status` / `checkout` 会去 gitcode.com 取 blob 而本机代理拦 403。**只能当只读文本语料用。**
+- 技能判据的**源**是 `docs\AI_PLAYBOOK.md`（受 git 控制）；DSH 实际读的是镜像
+  `~\.dsh\skills\godot-docs\SKILL.md`（**在任何 git 仓库之外，换机器会丢**）。
+  **改完 playbook 必须同步**：
+  ```powershell
+  pwsh -File tools\sync-ai-playbook.ps1          # 源 → 镜像
+  pwsh -File tools\sync-ai-playbook.ps1 -Check   # 只查漂移，退出码 1 = 不同步
+  ```
+
+## 2. 项目是什么
+
+**《代书》** —— 明中期代笔先生模拟器。穷书生 **10 天**内替人代写书信攒 **500 文**进京赶考。
+玩法是《Paper, Please》式文书劳作，但反过来：**不是检查别人的文书，而是自己把信组装出来**
+（选称谓 → 按信型填正文三空 → 落款署名）。
+
+- **引擎**：Godot **4.6**（本机 4.6.1-stable **mono**），**纯 GDScript**（未用 C#）
+- **渲染器**：GL Compatibility（`gl_compatibility`）
+- **入口场景**：`res://scenes/title_screen.tscn`
+- **视口**：1152×648，**已在 `project.godot` 显式写死**（信纸槽位对齐依赖它，别改）
+- **状态**：可玩纵向切片（playable alpha）。现状与剩余项见 `docs\PRE_RELEASE_UI_CHECK.md`
+  （**唯一权威进度表**）与 `docs\项目总览.md`（交接摘要）。
+
+## 3. 怎么跑、怎么验
+
+⚠️ **本机 `godot` 不在 PATH**，必须用完整路径（含空格，命令里要加引号）：
+
+```powershell
+$godot = 'D:\Program Files\Godot_v4.6.1-stable_mono_win64\Godot_v4.6.1-stable_mono_win64_console.exe'
+$proj  = 'D:\个人项目\daishu'
+
+& $godot --path $proj                                    # 跑游戏
+& $godot --headless --path $proj --import                # 新增/改动资源后必须导入
+```
+
+**用编辑器跑**：在 Godot 4.x 里打开 `project.godot`，按 **F5**（Run Project）。
+纯 GDScript 是运行时解释的，**没有构建步骤**；项目**没有 CI、没有测试套件、没有 lint**
+—— 所以第 3 节那些 `tools\` 下的验证脚本就是本项目的事实标准，别指望别的闸门。
+
+**改完必须跑验证脚本**（比肉眼看截图可靠）：
+
+| 命令 | 验什么 | 期望 |
+|---|---|---|
+| `--script res://tools/verify_drop.gd` | 五槽落词 + 拖拽预览 + 判定 | `总体: PASS` |
+| `--script res://tools/verify_theme.gd` | 全局 Theme 三查（设置项→资源→控件实际取值）| `结论: PASS` |
+| `--script res://tools/verify_avatar.gd` | 头像关系映射 + 缺字段不崩 | `结论: PASS` |
+| `--script res://tools/capture_scene.gd -- --scene <名> --out x.png [--click <按钮>]` | 任意场景截图 | 出图**必须 1152×648**，否则脚本报错 |
+| `--script res://tools/probe_geom.gd` | 量贴图绘制区 / 槽位实际矩形 | 判断锚点该写多少 |
+| `node tools/md_structure_check.mjs <file.md>` | Markdown 结构（标题重复/孤儿节/表格）| 改完文档后跑 |
+| `node tools/art_check.mjs <info\|palette\|grid\|watermark\|crop> <图>` | 美术素材校验 | 见第 6 节 |
+| `node tools/balance_sim.mjs` | 数值蒙特卡洛 | 见 `docs\BALANCE_REPORT.md` |
+
+**纪律**：项目文档 > 对话印象。**PPT/结论要先跑验证**；改完先自己验一遍再交付。
+
+## 4. 架构
+
+### 单例（`project.godot` 的 `[autoload]`）
+
+| 单例 | 职责 |
+|---|---|
+| `PlayerManager` | 金钱（初始 100）、天数（1..10）、已完成委托、每日流水、存读档（`user://save.dat`）、结局判定（≥500 文 = 成功）|
+| `NPCManager` | 每日生成委托人：姓名、**关系**、正确答案、词库、反馈文本。**NPC id 为负数** |
+| `JudgeSystem` | 判定与计费，四档（PERFECT/GOOD/NORMAL/WRONG）—— **算钱规则见下方「经济数值」** |
+| `FontFallback` | 启动时给主题字体挂系统字体兜底（`Font.fallbacks` **无法存进 `.tres`**，见 `docs\AI_PLAYBOOK.md`）|
+
+场景脚本**直接访问单例**（`PlayerManager.add_money(20)`、`get_node("/root/NPCManager")`），
+没有依赖注入或服务定位层。
+
+### 场景流
+
+```
+title_screen → prologue → main → letter（在 main 之上实例化）→ main → success / gameover
+```
+
+- **`title_screen`** —— 新游戏（重置状态）/ 继续（读档）/ 退出；标题「代书」用项目字体渲染
+- **`prologue`** —— 剧情开场，一个按钮继续
+- **`main`** —— 枢纽：显示钱/天，「开始今日」生成委托列表（**头像 + 按钮**），点委托实例化 `letter.tscn` 并隐藏自己；「结束今日」触发结算
+- **`letter`** —— 代写界面：左侧是可拖拽词按钮（`word_button.gd`），右侧是可放置槽位（`letter_slot.gd`，虚线边框 `_draw`）。提交 → `JudgeSystem` → 弹窗 → `PlayerManager` 记录 → 回 `main`
+- **`success` / `gameover`** —— 共用 `EndGameScreen.gd`，靠 `@export var is_success: bool` 区分
+
+### 关键数据结构
+
+**NPC 字典**（`NPCManager` 生成）：`npc_id`（负数）、`name`、**`relation`**（父母/子女/夫妻/兄弟/朋友，
+决定称谓池与落款池、也驱动头像取字取色）、`request_text`（口述，正解已嵌进句子）、
+`correct`（`salutation` / `body_slots.slot1/2/3` / `signature`）、`word_pool`（与 correct 平行的候选数组）、
+`base_fee`、`perfect_bonus`、`feedback`、`description`、`avatar`（**当前恒为空，未使用**）。
+
+**玩家答案**（传给 `JudgeSystem.judge(npc, answers)`）：
+`{salutation, body_slot1, body_slot2, body_slot3, signature}`，全是字符串。
+
+⚠️ **`word_pool` 的正文槽是嵌套的**：`word_pool.body_slots.slot1`（**不是** `word_pool.slot1`）。
+`JudgeSystem._check_item()` 对正文键做了嵌套处理。
+
+### 经济数值
+
+| 项 | 值 |
+|---|---|
+| 起始铜钱 | 100 文 |
+| 目标 | 10 天后 ≥ 500 文 |
+| 每日摊位费 | 10 文（`STALL_FEE_PER_DAY`），**钱变负立即结束** |
+| 基础报酬 | `12 + floor((day-1)/3)` |
+| 完美加成 | `8 + (day-1)` |
+
+| 判定 | 条件 | 报酬 |
+|---|---|---|
+| **WRONG** | **有格式错误**（留空，或用了词库外的词）| **`fee = -2 × 错误项数`（负数）**；**优先级最高** —— 有格式错误就不再看正确数 |
+| **PERFECT** | 五项全对 | `base_fee + perfect_bonus` |
+| **GOOD** | 五项中四对 | `base_fee + int(perfect_bonus × 0.7)` |
+| **NORMAL** | 其余（词库内但非正解）| `int(base_fee × 0.6)` |
+
+判定顺序（`JudgeSystem.gd:63-79`）：`格式错误 > 全对 > 四对 > 其余`。
+**注意 WRONG 是"直接判负"**，不是在 `base_fee` 上扣 —— 别把两者叠加理解。
+详见 `docs\JUDGE_SYSTEM_LOGIC.md`。
+
+### UI 约定
+
+- 中文竖排用 `_to_vertical()`（一字一行，自上而下）
+- 信纸正文用 `assets/fonts/hanchanlongcang.otf`（寒蝉龙藏体，毛笔书法，**个人与企业免费商用**，
+  授权说明见 `assets/fonts/寒蝉字体授权说明.txt`）
+- **全局 Theme**：`theme\daishu_theme.tres` 由 `project.godot` 的 `gui/theme/custom` 挂载，
+  六个场景共用（中文字体 + 按钮九宫格）。**全局字号变了要重截所有含列表的界面**（会撑破容器）
+- 可拖拽词：`word_button.gd`（拖拽数据打包 `{type, word, category, body_slot}`）
+- 放置槽：`letter_slot.gd`（`_can_drop_data` 校验 `category`/`body_slot`，发出 `word_dropped(slot_key, word)`）
+
+## 5. 美术硬规矩
+
+⚠️ **任何要出货的素材不得含文字/水印/品牌标识**（`docs\ART_PLAN.md` §一）。
+
+**审计结论（2026-10-12 实测，别重复怀疑）**：`tools\art_check.mjs watermark --scan` 会在这几张图上报命中，
+**逐张裁出来目视复核后的实际结论**：
+
+| 图 | 检测器 | 目视复核结论 |
+|---|---|---|
+| `letter.png` | ✅ 未检出 | **干净**。右下角那处"疑似残影"裁出来放大看过：只有像素风阶梯边框，**没有字形**（据此改过一版凭印象写的错误结论）|
+| `main.png` | ✅ 未检出（附一处 bbox）| bbox `[2311,439..2368,493]` 是**集市摊位里的人与货**，非文字 |
+| `main_bg.png` | ⚠️ **报命中** | bbox `[1928,479..1983,516]` 同样是**摊位里的人与货** —— **误报**，但**检测器仍会报**，别当成回归 |
+
+**规则**：检测器报命中时**必须裁出来人眼复核**再决定；**不能只依据退出码**。
+三张底图的生成器水印已于 2026-10-12 全部清除（做法见 `docs\ART_PLAN.md` §三）。
+
+**已知未处理问题**：标题页用 `main.png`（**水墨风**），主界面用 `main_bg.png`（**像素插画风**）——
+**两者不是同一画风**，对比图与三种处置方案见 `docs\ART_PLAN.md` §二·五。
+
+### 素材校验工具（零依赖，只用 node 内置 zlib，**不需要 npm install**）
+
+```bash
+node tools/art_check.mjs info      <img>              # 尺寸/格式/亮度
+node tools/art_check.mjs palette   <img>              # 色板量化 + 与 ART_PLAN 锚点色对比（色距 >0.30 判偏离）
+node tools/art_check.mjs grid      <img> --expect 12  # 竖线像素检测 → 栏位分数表（信纸锚定用）
+node tools/art_check.mjs watermark <img> --scan       # 水印排查
+node tools/art_check.mjs crop      <img> --box x0,y0,x1,y1 --out f   # 取局部供人眼复核
+```
+
+**带网格的底图改锚点必须走三步**：`grid` 量结构 → 写锚点 → **截图后复验**。**禁止目测估结构位置。**
+
+## 6. 文档坐标系（谁是权威）
+
+| 要查什么 | 权威文档 |
+|---|---|
+| **本文件的规则依据、本机踩坑（18 条）** | `docs\AI_PLAYBOOK.md`（+ `-DETAILS.md` 完整版）|
+| **发布前进度 / 剩余项** | `docs\PRE_RELEASE_UI_CHECK.md` ← **唯一权威进度表** |
+| 交接摘要（现状/历程/怎么跑/怎么验）| `docs\项目总览.md` |
+| 美术方向、色板锚点、资产清单、水印与画风实测 | `docs\ART_PLAN.md` |
+| 开发计划与里程碑 | `docs\DEV_PLAN.md` |
+| 单例职责 / 依赖 / API | `docs\ARCHITECTURE_SINGLETONS.md`、`docs\SINGLETON_APIS.md` |
+| 场景节点树与信号 | `docs\SCENE_OVERVIEW.md` |
+| 判定与计费 | `docs\JUDGE_SYSTEM_LOGIC.md` |
+| NPC 生成规则 | `docs\NPC_GENERATION.md` |
+| 存档与数据结构 | `docs\DATA_FORMATS.md` |
+| 数值平衡模拟 | `docs\BALANCE_REPORT.md` |
+| 项目蓝图总览 | `docs\readme.md` |
+| 仓库页说明 | `README.md` |
+
+⚠️ **已过时的说法**（改动前先看权威文档）：`DEV_PLAN.md` 的"已知问题"段仍写着信纸带水印（**已清除**）；
+`README.md` 里也有几处旧状态。**冲突时以 `PRE_RELEASE_UI_CHECK.md` 与 `ART_PLAN.md` 为准。**
+
+## 7. 环境与依赖
+
+```
+scripts/          # 所有 .gd（单例 + 场景脚本 + UI 辅助 + npc_avatar.gd）
+scenes/           # 6 个 .tscn
+theme/            # daishu_theme.tres（全局主题）
+assets/
+  fonts/          # hanchanlongcang.otf + 授权说明
+  images/
+    backgrounds/  # main.png（标题）/ main_bg.png（主界面）/ letter.png（信纸）
+    ui/           # button_frame.png（九宫格）/ brush_cursor.png（拖拽预览）
+data/             # art_prompts_round1/2.json（美术生成提示词）
+docs/             # 设计文档（见第 6 节）
+tools/            # 校验 / 模拟 / 截图 / 环境脚本
+godot-docs/       # Godot 4.6 官方文档语料（gitignore，只读）
+godot-mcp/        # Godot MCP 服务端，git-clone 依赖（gitignore）
+addons/           # Godot 插件（可能为空）
+```
+
+- **round1 的 15 张 832×832 候选素材不在仓库里**，归档在 `D:\daishu_asset_archive\`
+  （`196001c` 移出，**没丢**，已复检无水印）。**别重新生成。** 见 `docs\ART_PLAN.md` §八。
+- **导出**：`export_presets.cfg` 有 `Windows Desktop` 预设；模板已装
+  （`%APPDATA%\Godot\export_templates\4.6.1.stable.mono`）。导出产物已 gitignore，**不进仓库**。
+- **mono 引擎**会打印 `.NET Sdk not found` —— 纯 GDScript 项目，**这条可忽略**，别去装 .NET SDK。
+
+### MCP 接线（`godot-mcp/`）
+
+`godot-mcp/` 是 git-clone 依赖、`.claude/mcp.json` 被 gitignore，**新克隆没有 MCP 接线**。一键复现：
+
+```powershell
+pwsh -File tools\setup-godot-mcp.ps1
+```
+
+- 必须用 **SSH**（本机 HTTPS 到 github.com 被拦）
+- `GODOT_PATH` 必须指向 **`*_console.exe`**（非 console 版重定向 stdout 输出 0 字节，
+  会**静默**破坏 `run_project` / `get_debug_output`）
+- 服务端暴露 **14 个** `mcp__godot__*` 工具
+- DSH 侧的接线**不走** `.claude/mcp.json`，而在 `~/.dsh/profiles/web/cordis.patch.yml` 的 `mcp-godot` 条目（热监听）
+- **接线状态要现查**（会自己消失）。判据三查：① 文件里有 `mcp-godot` ② 进程表有
+  `node.exe … godot-mcp\build\index.js` ③ 新会话工具清单里有 `mcp__godot__*`
+
+## 8. AI 协作纪律
+
+1. **改 GDScript / 场景前先查 `godot-docs`**（第 1 节），别凭记忆。
+2. **验完再说"完成"**：跑第 3 节的验证脚本；**"命令没报错"不等于"生效了"**
+   （实测：同尺寸改写图片时 Godot **不会**重新导入，`.ctex` 仍是旧像素）。
+3. **出图看着不对时，先怀疑工具漏步骤**，用探针打印节点数/尺寸再下结论 ——
+   本会话两次误判（"槽位不可见"、"主题把词库按钮弄没了"）**都是观察方式的问题，不是游戏坏了**。
+4. **拿"标题行"当 `edit` 锚点会造出孤儿正文**：插入章节时**以正文首行当锚点**（把标题拼进 new_string），
+   写完跑 `node tools\md_structure_check.mjs <file.md>`。同一手法在同一个文件里连踩三次。
+5. **改 `docs\` 下的文档后跑结构守卫**；改了 playbook 就同步镜像（第 1 节）。
+6. **共享目录里不要用 `git add -A`**（会把并行会话的在途改动一起提交）。显式列路径。
+7. **`~\.dsh\AGENTS.md` 的「实测陷阱」封顶 12 条**，新增一条 = 同时退役一条（原子操作）；
+   详细规则见 `~\.dsh\RULES-PLAN.md`。**本项目的本机踩坑写在 `docs\AI_PLAYBOOK.md`**，不写进用户级。

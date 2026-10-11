@@ -17,3 +17,7 @@ export/
 *.pck
 *.exe
 *.x86_64
+
+# 规则文件的本地备份（改 AGENTS.md / CLAUDE.md 前留的，不是源码）
+AGENTS.md.bak-*
+CLAUDE.md.bak-*
