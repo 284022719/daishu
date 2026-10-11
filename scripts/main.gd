@@ -1,5 +1,7 @@
 extends Control
 
+const NPCAvatar := preload("res://scripts/npc_avatar.gd")
+
 # 节点引用
 @onready var money_label = $MainPanel/VBoxContainer/StatusBar/MoneyLabel
 @onready var day_label = $MainPanel/VBoxContainer/StatusBar/DayLabel
@@ -27,6 +29,19 @@ func _ready():
 	
 	# 默认不显示NPC列表（等点击“开始今日”后显示）
 	clear_npc_list()
+
+## 面板高度跟内容走。
+## 面板是 root Control 的直接子节点（不在任何 Container 里），所以 size_flags /
+## custom_minimum_size 都不会被自动采纳 —— 高度必须自己算，否则内容一长就顶出屏幕上沿
+## （实测：加了头像后每行 37→44px，VBox 最小高 280 > 面板给的 238，状态栏被推出屏幕）。
+func _resize_panel_to_content() -> void:
+	var panel: Panel = $MainPanel
+	var vbox: Control = $MainPanel/VBoxContainer
+	var sb := panel.get_theme_stylebox("panel")
+	var pad := sb.get_content_margin(SIDE_TOP) + sb.get_content_margin(SIDE_BOTTOM) if sb != null else 20.0
+	# 向上取整到 8px：与项目其它资产/UI 的 8px 对齐约定一致（ART_PLAN §五）
+	var needed: float = vbox.get_combined_minimum_size().y + pad
+	panel.offset_bottom = panel.offset_top + ceilf(needed / 8.0) * 8.0
 
 func add_money(delta: int) -> void:
 	PlayerManager.add_money(delta)
@@ -60,24 +75,62 @@ func _on_start_day_pressed():
 	# 清空之前的列表
 	clear_npc_list()
 	
-	# 为每个NPC创建一个按钮
+	# 为每个NPC创建一个条目：头像（左）+ 姓名与信型（右）
+	# 头像单独用固定尺寸的 Control 承载 —— 直接放进 HBox 会被主题的九宫格边距撑高
 	for npc in today_npcs:
 		var npc_id = npc.get("npc_id", null)
 		if npc_id != null and PlayerManager.is_npc_completed(int(npc_id)):
 			continue
-		var btn = Button.new()
-		btn.text = "%s（%s）" % [npc["name"], npc.get("letter_type", "家书")]
-		# 将NPC的id存储在按钮的meta中，便于点击时获取
-		btn.set_meta("npc_id", npc["npc_id"])
-		btn.pressed.connect(_on_npc_button_pressed.bind(btn))
-		npc_list_container.add_child(btn)
+		npc_list_container.add_child(_make_npc_row(npc))
+
+	# 行数变了，面板高度跟着变（不这么做，条目一多就会顶出屏幕上沿）
+	_resize_panel_to_content()
+
+# 单条委托：左侧头像 + 右侧按钮
+func _make_npc_row(npc: Dictionary) -> Control:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 10)
+
+	var avatar_slot := Control.new()
+	avatar_slot.custom_minimum_size = Vector2(NPCAvatar.SIZE, NPCAvatar.SIZE)
+	avatar_slot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var avatar := NPCAvatar.new()
+	avatar.setup(npc)
+	avatar_slot.add_child(avatar)
+	row.add_child(avatar_slot)
+
+	var btn := Button.new()
+	# 补上关系：它决定称谓池，是玩家真的要读的信息（与 avatar 同一份数据来源）
+	var relation := str(npc.get("relation", ""))
+	var label := "%s（%s）" % [npc["name"], npc.get("letter_type", "家书")]
+	if not relation.is_empty():
+		label = "%s · %s（%s）" % [npc["name"], relation, npc.get("letter_type", "家书")]
+	btn.text = label
+	btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	# 将NPC的id存储在按钮的meta中，便于点击时获取
+	btn.set_meta("npc_id", npc["npc_id"])
+	btn.pressed.connect(_on_npc_button_pressed.bind(btn))
+	row.add_child(btn)
+	return row
 
 func on_npc_completed(npc_id: int) -> void:
 	PlayerManager.mark_npc_completed(npc_id)
-	for child in npc_list_container.get_children():
-		if child is Button and child.has_meta("npc_id") and int(child.get_meta("npc_id")) == npc_id:
-			child.queue_free()
+	# 结构已改为「每行 = 头像 + 按钮」，按钮不再直接挂在 NPCList 下，所以递归找、
+	# 并整体移除那一行（只删按钮会留下孤立的头像）
+	for row in npc_list_container.get_children():
+		var btn := _find_npc_button(row, npc_id)
+		if btn != null:
+			row.queue_free()
 			break
+
+func _find_npc_button(node: Node, npc_id: int) -> Button:
+	if node is Button and node.has_meta("npc_id") and int(node.get_meta("npc_id")) == npc_id:
+		return node as Button
+	for child in node.get_children():
+		var found := _find_npc_button(child, npc_id)
+		if found != null:
+			return found
+	return null
 
 func _on_npc_button_pressed(btn):
 	var npc_id = btn.get_meta("npc_id")

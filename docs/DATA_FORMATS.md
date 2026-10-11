@@ -114,9 +114,10 @@
 | `name` | `String` | NPC 昵称，由 `FIRST_NAMES` + `LAST_NAMES` 随机组合，如 `"张大牛"`。 |
 | `first_day` | `int` | NPC 首次出现的天数，目前恒为 `1`，为未来剧情扩展预留。 |
 | `required_calligraphy` | `int` | 要求的书法等级，目前恒为 `0`，未来可用于书法系统。 |
-| `avatar` | `String` | 头像资源路径，目前为空字符串。 |
-| `description` | `String` | NPC 文本描述，例如 `"一位普通的路人"`。 |
-| `letter_type` | `String` | 信件类型，目前为 `"家书"`。 |
+| `avatar` | `String` | 头像资源路径，目前恒为空字符串（**未使用**）。界面头像改由 `relation` 驱动、程序化绘制，见 `scripts/npc_avatar.gd`（真素材到位后此字段才是入口）。 |
+| `relation` | `String` | 与收信人的关系，取值为 `父母/子女/夫妻/兄弟/朋友`。**决定称谓池与落款池**（`NPCManager.SALUTATION_POOL` / `SIGNATURE_POOL`），也用于界面头像取字取色。2026-10-12 补入（此前在 `make_npc` 里算过但没返回）。 |
+| `description` | `String` | NPC 文本描述，例如 `"一位想给父母写信的诉苦"`。 |
+| `letter_type` | `String` | 信件类型，取值为 `家书/请安/贺寿/诉苦/求荐`（五选一）。 |
 | `request_text` | `String` | NPC 的口述需求文本，已经将正文正确词 `slot1/2/3` 格式化进句子内，供代写界面展示。 |
 | `correct` | `Dictionary` | 当前 NPC 对应的“标准答案”，供 `JudgeSystem` 判定使用。 |
 | `word_pool` | `Dictionary` | 提供给前端 UI 和 `JudgeSystem` 的合法词库，用于生成词按钮与校验格式。 |

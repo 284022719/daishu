@@ -163,6 +163,7 @@ func generate_random_npc(day: int = 1) -> Dictionary:
 		"first_day": 1,
 		"required_calligraphy": 0,
 		"avatar": "",
+		"relation": relation,
 		"description": description,
 		"letter_type": letter_type,
 		"request_text": story,
