@@ -8,6 +8,17 @@
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_antxc"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_slot"]
+content_margin_left = 2.0
+content_margin_top = 2.0
+content_margin_right = 2.0
+content_margin_bottom = 2.0
+bg_color = Color(0.99, 0.965, 0.9, 0.3)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
 [node name="Letter" type="Control" unique_id=1343437158]
 layout_mode = 3
 anchors_preset = 15
@@ -127,13 +138,13 @@ mouse_filter = 2
 [node name="SalutationSlot" type="Panel" parent="PaperArea" unique_id=1281543972]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.7253
-anchor_top = 0.12
-anchor_right = 0.7980
-anchor_bottom = 0.85
+anchor_left = 0.69402
+anchor_top = 0.117
+anchor_right = 0.82908
+anchor_bottom = 0.882
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxEmpty_antxc")
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
 script = ExtResource("3")
 slot_key = "salutation"
 expected_category = "salutation"
@@ -153,13 +164,13 @@ vertical_alignment = 1
 [node name="BodySlot1" type="Panel" parent="PaperArea" unique_id=2051957997]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.5759
-anchor_top = 0.12
-anchor_right = 0.7253
-anchor_bottom = 0.85
+anchor_left = 0.52354
+anchor_top = 0.117
+anchor_right = 0.69402
+anchor_bottom = 0.882
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_styles/panel = SubResource("4_transparent")
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
 script = ExtResource("3")
 slot_key = "body_slot1"
 expected_category = "body"
@@ -180,13 +191,13 @@ vertical_alignment = 1
 [node name="BodySlot2" type="Panel" parent="PaperArea" unique_id=730639774]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.4304
-anchor_top = 0.12
-anchor_right = 0.5759
-anchor_bottom = 0.85
+anchor_left = 0.35240
+anchor_top = 0.117
+anchor_right = 0.52354
+anchor_bottom = 0.882
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_styles/panel = SubResource("4_transparent")
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
 script = ExtResource("3")
 slot_key = "body_slot2"
 expected_category = "body"
@@ -207,13 +218,13 @@ vertical_alignment = 1
 [node name="BodySlot3" type="Panel" parent="PaperArea" unique_id=440605257]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.2809
-anchor_top = 0.12
-anchor_right = 0.4304
-anchor_bottom = 0.85
+anchor_left = 0.18126
+anchor_top = 0.117
+anchor_right = 0.35240
+anchor_bottom = 0.882
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_styles/panel = SubResource("4_transparent")
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
 script = ExtResource("3")
 slot_key = "body_slot3"
 expected_category = "body"
@@ -234,13 +245,13 @@ vertical_alignment = 1
 [node name="SignatureSlot" type="Panel" parent="PaperArea" unique_id=1836985505]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.1335
-anchor_top = 0.12
-anchor_right = 0.2809
-anchor_bottom = 0.85
+anchor_left = 0.06012
+anchor_top = 0.117
+anchor_right = 0.18126
+anchor_bottom = 0.882
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_styles/panel = SubResource("4_transparent")
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
 script = ExtResource("3")
 slot_key = "signature"
 expected_category = "signature"
