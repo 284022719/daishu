@@ -84,6 +84,7 @@ daishu/
 
 | 文档 | 内容 |
 |---|---|
+| [`docs/项目总览.md`](docs/项目总览.md) | **交接摘要**：现状、历程、怎么跑、怎么验、踩坑、下一步 |
 | [`docs/readme.md`](docs/readme.md) | 项目蓝图总览（系统架构、数据格式、核心机制） |
 | [`docs/DEV_PLAN.md`](docs/DEV_PLAN.md) | 开发计划与当前基线 |
 | [`docs/SCENE_OVERVIEW.md`](docs/SCENE_OVERVIEW.md) | 各场景节点树与信号连接 |
