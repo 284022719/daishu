@@ -91,6 +91,7 @@ daishu/
 | [`docs/NPC_GENERATION.md`](docs/NPC_GENERATION.md) | 随机 NPC 生成规则 |
 | [`docs/DATA_FORMATS.md`](docs/DATA_FORMATS.md) | 存档与 NPC 数据结构 |
 | [`docs/ART_PLAN.md`](docs/ART_PLAN.md) | 美术方向、色板、资产清单与水印实测 |
+| [`docs/PRE_RELEASE_UI_CHECK.md`](docs/PRE_RELEASE_UI_CHECK.md) | 发布前界面诊断：资产缺口与必须替换的清单 |
 | [`docs/BALANCE_REPORT.md`](docs/BALANCE_REPORT.md) | 数值平衡蒙特卡洛模拟报告 |
 | [`docs/AI_PLAYBOOK.md`](docs/AI_PLAYBOOK.md) | AI 协作流程与工具链说明 |
 
