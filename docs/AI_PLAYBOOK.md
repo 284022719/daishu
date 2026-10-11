@@ -61,7 +61,7 @@ whenToUse: 任务涉及 Godot 引擎 / GDScript / 场景 / 节点 / 信号 / 资
   > （走白名单代理，未列出即 403）是两条路。抓网页优先用 `web_fetch`。
 - 拿不准就是在猜。宁可多读一篇 rst，也不要写一个没出处的 API。
 
-# 项目文档地图（代书，`D:\daishu`）
+# 项目文档地图（代书，`D:\个人项目\daishu`）
 
 写《代书》的代码前，先看项目自己的文档——它们比通用教程更贴近本项目约定：
 
@@ -100,7 +100,7 @@ whenToUse: 任务涉及 Godot 引擎 / GDScript / 场景 / 节点 / 信号 / 资
    `get_godot_version` / `list_projects` / `get_project_info` / `create_scene` / `add_node` /
    `load_sprite` / `export_mesh_library` / `save_scene` / `get_uid` / `update_project_uids`。
    实测 `get_godot_version` → `4.6.1.stable.mono.official.14d19694e`，
-   `get_project_info D:\daishu` → 认出项目结构。
+   `get_project_info D:\个人项目\daishu` → 认出项目结构。
    > 沿革：这条接线原先**只在 `web` profile** 里，10 月改用 `desktop` 后这 14 个工具就消失了
    > （会话统计佐证：带 godot 工具的请求全部来自 web 时期）。2026-10-10 把同一条 `insert`
    > 抄进 desktop 的 patch 后恢复，**实测热重组即时生效、不需要重启**。
@@ -120,8 +120,8 @@ whenToUse: 任务涉及 Godot 引擎 / GDScript / 场景 / 节点 / 信号 / 资
    console exe 的完整路径：
    `D:\Godot_v4.6.1-stable_mono_win64\Godot_v4.6.1-stable_mono_win64_console.exe`。
    **引用这个路径的地方共 6 处**，升级 Godot 版本时要一起改：两个 profile 的 `cordis.patch.yml`、
-   `D:\daishu\.claude\mcp.json`、`D:\daishu\.claude\settings.local.json`（3 条权限项）、
-   `D:\daishu\.vscode\settings.json` 的 `godotTools.editorPath.godot4`、以及 Godot 自带的
+   `D:\个人项目\daishu\.claude\mcp.json`、`D:\个人项目\daishu\.claude\settings.local.json`（3 条权限项）、
+   `D:\个人项目\daishu\.vscode\settings.json` 的 `godotTools.editorPath.godot4`、以及 Godot 自带的
    `godot.cmd` / `godot-console.cmd`。
 6. **美术素材必须像素级校验，禁止目测**（ART_PLAN §四 已把这写成硬规范）—— 用 `tools\art_check.mjs`
    （零依赖，只用 node 内置 `zlib`，自带 PNG 解码/编码，**不需要 npm install**）：
@@ -167,7 +167,7 @@ Invoke-WebRequest -Uri $u -OutFile "$env:TEMP\templates.tpz"     # ≈1.09 GiB
 
 # 源码与同步（本文件即 DSH 技能 `godot-docs` 的源）
 
-- **唯一源**：`D:\daishu\docs\AI_PLAYBOOK.md`（本文件，受 git 版本控制）
+- **唯一源**：`D:\个人项目\daishu\docs\AI_PLAYBOOK.md`（本文件，受 git 版本控制）
 - **镜像**：`C:\Users\28402\.dsh\skills\godot-docs\SKILL.md` —— DSH 实际读取的技能文件。
   它在用户目录下，**不属于任何 git 仓库**，换机器或重装 DSH 会丢，所以源放在仓库、镜像是派生物。
 - 改完必须同步，否则 DSH 读到的仍是旧知识：
