@@ -136,6 +136,12 @@ Description → Properties → Methods → Signals → Enumerations → Constant
     于是 `--import` 报"无错误"却什么也没做，`.ctex` 仍是旧像素（探针量到的贴图尺寸/绘制区都没变）。
     判据：**同尺寸改写图片后，必须删掉 `.godot/imported/<图>-<哈希>.ctex` 与 `.md5` 再 `--import`**；
     验证要落到"渲染出来的图变了没有"，别只看导入命令的退出码。
+18. **改 Markdown 章节后必须跑结构守卫，别靠眼睛**：**拿"标题行"当 edit 的替换锚点**最容易
+    漏写回旧标题 —— 旧标题消失、正文成了"挂在上一节下面"的孤儿：**内容都还在，肉眼扫过去像正常文档**。
+    实测 2026-10-12 在同一个文件（`docs/PRE_RELEASE_UI_CHECK.md`）里**同一手法连踩三次**，
+    还留下过重复表格行。判据：**用 `node tools/md_structure_check.mjs <file.md>`**（本项目工具，
+    带 `--selftest`）检查标题重复 / 空节孤儿 / 表格分隔行配对 / 游离表格行 / 代码围栏配对；
+    插入章节时**以正文首行当锚点**（把标题拼进 new_string）。
 
 # 维护与导出
 
