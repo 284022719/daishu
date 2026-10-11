@@ -73,8 +73,18 @@ func _initialize() -> void:
 		print("  [%s] %s <- '%s'  显示='%s'  字色=(%.2f, %.2f, %.2f, %.2f)" % [
 			"OK" if ok else "FAIL", c["slot"], want, shown, col.r, col.g, col.b, col.a
 		])
+		if ok and not _check_drag_preview(btn):
+			all_ok = false
 		if not ok:
 			all_ok = false
+
+	# 拖拽预览结构校验（毛笔图 + 词文本）
+	print("--- 拖拽预览校验 ---")
+	var probe_container: Node = word_panel.get_node("SalutationContainer")
+	for child in probe_container.get_children():
+		if child is Button:
+			_check_drag_preview(child, true)
+			break
 
 	# 验证 player_answers 是否同步
 	print("--- player_answers ---")
@@ -116,3 +126,39 @@ func _find_button(container: Node, want: String) -> Button:
 			if found != null:
 				return found
 	return null
+
+# 校验拖拽数据 + 预览结构
+# 注意：不要直接调 _get_drag_data() —— 没有真实拖拽在进行时 set_drag_preview() 会触发引擎断言。
+#       预览构造已抽成 build_drag_preview()，可单独调用。
+func _check_drag_preview(btn: Button, verbose: bool = false) -> bool:
+	if not btn.has_method("build_drag_preview"):
+		print("  [FAIL] 按钮没有 build_drag_preview: ", btn.text)
+		return false
+	var preview: Control = btn.build_drag_preview()
+	if preview == null:
+		print("  [FAIL] 预览节点为空: ", btn.text)
+		return false
+	var tex_count := _count_texture_rects(preview)
+	var text_found := _find_label_text(preview)
+	var ok := tex_count > 0 and text_found == btn.text
+	if verbose or not ok:
+		print("  [%s] 拖拽预览 '%s'  毛笔贴图=%d 个  文本='%s'" % [
+			"OK" if ok else "FAIL", btn.text, tex_count, text_found
+		])
+	preview.queue_free()
+	return ok
+
+func _count_texture_rects(n: Node) -> int:
+	var c := 1 if n is TextureRect else 0
+	for child in n.get_children():
+		c += _count_texture_rects(child)
+	return c
+
+func _find_label_text(n: Node) -> String:
+	if n is Label:
+		return (n as Label).text
+	for child in n.get_children():
+		var t := _find_label_text(child)
+		if not t.is_empty():
+			return t
+	return ""

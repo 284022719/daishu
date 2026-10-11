@@ -3,7 +3,7 @@ extends Control
 # 节点引用
 @onready var money_label = $MainPanel/VBoxContainer/StatusBar/MoneyLabel
 @onready var day_label = $MainPanel/VBoxContainer/StatusBar/DayLabel
-@onready var npc_list_container = $MainPanel/VBoxContainer/ScrollContainer/NPCList
+@onready var npc_list_container = $MainPanel/VBoxContainer/NPCList
 @onready var start_day_btn = $MainPanel/VBoxContainer/ButtonBar/StartDayBtn
 @onready var end_day_btn = $MainPanel/VBoxContainer/ButtonBar/EndDayBtn
 @onready var save_quit_btn = $MainPanel/VBoxContainer/ButtonBar/SaveQuitBtn
