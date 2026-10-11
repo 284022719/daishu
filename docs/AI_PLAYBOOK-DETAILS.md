@@ -96,9 +96,11 @@ signal 11 段错误，且 `--check-only` 单脚本同样崩、`--verbose` 也无
   `run_project` / `get_debug_output` 靠捕获 stdout 工作 —— 指错**不报错，只是静默拿不到调试输出**。
   更隐蔽的是：路径失效时服务端**静默回落到内置默认**（`C:\Program Files\Godot\Godot.exe`），
   症状是"MCP 起得来、一调用就 `spawn … ENOENT`"，**不会报"你的配置指错了"**。
-- 接线有**两处、互不相干**：项目内 `.claude\mcp.json`（被 gitignore）与 DSH profile 的
-  `cordis.patch.yml`（`mcp-godot` 条目，热监听，保存即生效）。
-  复现用 `tools\setup-godot-mcp.ps1` —— 它**必须用 SSH 克隆**（本机 HTTPS 到 github.com 不通）。
+- 接线**只有一处**（2026-10-12 起）：DSH profile 的 `cordis.patch.yml`（`mcp-godot` 条目，
+  热监听，保存即生效）。项目内的 `.claude\mcp.json` **已删除** —— 原先有"两处互不相干"的接线，
+  但那一处从来没有被任何工具读取过（见下条实测），继续留着只会误导。
+  复现用 `tools\setup-godot-mcp.ps1` —— 它**必须用 SSH 克隆**（本机 HTTPS 到 github.com 不通），
+  并且**不再写任何配置文件**，只在最后打印该填进 profile 的 `command` / `args` / `GODOT_PATH`。
 - **DSH profile 的 patch 文件里有两种东西，可靠性不同**：`insert` / `id` 覆盖这类
   **loader patch 手写可靠**；而同一个文件里的 **settings 命名空间**（如
   `subagent-model-selection-settings`）会被应用以它自己的权威副本覆盖，手写会被剪掉 ——
@@ -113,23 +115,26 @@ console exe 的完整路径：
 `D:\Program Files\Godot_v4.6.1-stable_mono_win64\Godot_v4.6.1-stable_mono_win64_console.exe`。
 ⚠️ 新路径**含空格**：这些引用点要么用引号整体包起来、要么作为 `spawn` 的参数传入（不经 shell），
 所以空格安全 —— 但**别**把它拼进一条未加引号的命令行。
-**引用这个路径的地方（2026-10-12 重新实测，含被 gitignore 的文件）**，
-升级 Godot 版本或再搬目录时要一起改。仓库内共 **6 个文件 / 9 处**：
+**引用这个路径的地方（2026-10-12 逐行实测，含被 gitignore 的文件）**，
+升级 Godot 版本或再搬目录时要一起改。仓库内共 **4 个文件 / 6 处**：
 
-| 文件 | 处数 | 备注 |
+| 文件 | 处数 | 具体位置 |
 |---|---|---|
-| `.claude\settings.local.json` | 3 | **未跟踪、本地文件**（权限项）|
-| `docs\AI_PLAYBOOK-DETAILS.md` | 2 | 本文件（含本节）|
-| `.claude\mcp.json` | 1 | **未跟踪 + 被 gitignore**；由 `tools\setup-godot-mcp.ps1` 生成 |
+| `docs\AI_PLAYBOOK-DETAILS.md` | 3 | 本节"Godot 装在哪"的裸目录、console exe 全路径、`.cmd` 包装器名 |
+| `AGENTS.md` | 1 | 第 3 节的 `$godot` 命令示例 |
+| `docs\项目总览.md` | 1 | 第 4 节的 `$godot` 命令示例 |
 | `.vscode\settings.json` | 1 | `godotTools.editorPath.godot4` |
-| `AGENTS.md` | 1 | 第 3 节的命令示例 |
-| `docs\项目总览.md` | 1 | 第 4 节 |
+| `tools\setup-godot-mcp.ps1` | 0 | **不写死路径**（按目录名搜索），所以搬目录后它仍能用 |
+
+> 2026-10-12 之前这里还列着 `.claude\settings.local.json`（3 处）与 `.claude\mcp.json`（1 处）——
+> 两者随 `.claude\` 目录一并删除，**不再是引用点**。删除原因：不再使用 Claude Code，
+> 且实测 `setup-godot-mcp.ps1` 写出的 `GODOT_PATH` 与那个文件里实际存的值**对不上**
+> （脚本写 `_console.exe`、文件里是非 console 版）—— 说明那文件早就是未被维护的残留。
 
 仓库**之外**另有 **4 处**（升级时同样要改）：
 
 - 两个 profile 的 `cordis.patch.yml`（`mcp-godot` 的 `GODOT_PATH`）——
-  这是 DSH 实际使用的接线，`.claude\mcp.json` 那条**已不再被任何工具读取**
-  （2026-10-12 起不再使用 Claude Code；脚本仍会生成它，属无害残留）。
+  这是**唯一实际生效**的接线。
 - **引擎自带的两个 `.cmd` 包装器**（实测存在，各写死 1 处路径）：
   `Godot_v4.6.1-stable_mono_win64\godot.cmd` 与 `godot-console.cmd`。
   它们让引擎像"PATH 上有个 godot 命令"一样可调用（项目里 `godot --path .` 这类用法靠它），

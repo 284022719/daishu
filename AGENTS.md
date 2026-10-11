@@ -220,17 +220,22 @@ addons/           # Godot 插件（可能为空）
 
 ### MCP 接线（`godot-mcp/`）
 
-`godot-mcp/` 是 git-clone 依赖、`.claude/mcp.json` 被 gitignore，**新克隆没有 MCP 接线**。一键复现：
+`godot-mcp/` 是 git-clone 依赖（被 gitignore），**新克隆没有 MCP 服务端**。一键复现：
 
 ```powershell
 pwsh -File tools\setup-godot-mcp.ps1
 ```
 
+脚本做四件事：定位 `*_console.exe` → 克隆并构建 `godot-mcp/` → **打印**接线配置 → 自检
+（含**真的向服务端发一次 JSON-RPC `initialize`**，确认它能起来）。
+**它不再写任何配置文件** —— 接线要人自己贴（见下一条），避免生成无人读取的残留。
+
 - 必须用 **SSH**（本机 HTTPS 到 github.com 被拦）
 - `GODOT_PATH` 必须指向 **`*_console.exe`**（非 console 版重定向 stdout 输出 0 字节，
   会**静默**破坏 `run_project` / `get_debug_output`）
 - 服务端暴露 **14 个** `mcp__godot__*` 工具
-- DSH 侧的接线**不走** `.claude/mcp.json`，而在 `~/.dsh/profiles/web/cordis.patch.yml` 的 `mcp-godot` 条目（热监听）
+- **实际生效的接线只有一处**：`~/.dsh/profiles/web/cordis.patch.yml` 的 `mcp-godot` 条目（热监听）。
+  脚本会打印该填的 `command` / `args` / `GODOT_PATH`
 - **接线状态要现查**（会自己消失）。判据三查：① 文件里有 `mcp-godot` ② 进程表有
   `node.exe … godot-mcp\build\index.js` ③ 新会话工具清单里有 `mcp__godot__*`
 
