@@ -62,6 +62,20 @@
 
 **复核方式**：改完必须重跑截图，确认虚线边与印刷线的关系。这是 ART_PLAN §四 ③ 要求的"截图 → 像素验证"三步的第三步。
 
+**修复前后的存档**（后续替换底图时可用作回归对照）：
+
+| 文件 | 说明 |
+|---|---|
+| [`screenshots/letter_slots_before.png`](screenshots/letter_slots_before.png) | 修复前：槽位压在栏线上、纵向溢出纸面 |
+| [`screenshots/letter_slots_after.png`](screenshots/letter_slots_after.png) | 修复后：槽位装进栏内、收进纸面 |
+| [`screenshots/letter_slot_zoom.png`](screenshots/letter_slot_zoom.png) | 放大 3 倍：占位提示与虚线边细节 |
+
+截图由 `tools/capture_letter.gd` 生成：
+
+```bash
+godot --path . --script res://tools/capture_letter.gd -- --out <路径.png>
+```
+
 ### ④ 词库区 `WordPanel` 背景透明
 
 `letter.tscn` 的 `WordPanel`（左侧词库区）是 `type="Panel"` 无自定义样式 —— 词库按钮**直接压在信纸底图的花纹上**，既看不清也难看。`ART_PLAN.md` 已把「词库区底板 355×~600」列为**缺失待新增**。
