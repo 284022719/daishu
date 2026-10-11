@@ -20,3 +20,9 @@ export/
 # 规则文件的本地备份（改 AGENTS.md / CLAUDE.md 前留的，不是源码）
 AGENTS.md.bak-*
 CLAUDE.md.bak-*
+
+# 生图交付暂存区：人把新生成的候选图放这里，接入后再移到 assets/images/ 正式位置。
+# 候选图/中间产物不入库（见 docs/ART_TITLE_REGEN.md）
+assets/images/_incoming/
+tools/*.bak-*
+tools/*.dbg-bak

@@ -19,8 +19,12 @@
 //   node tools/art_check.mjs watermark <img> [--scan|--crop] [--inset N]
 //                                            [--edges bottom,right] [--out f]
 //   node tools/art_check.mjs crop      <img> --box x0,y0,x1,y1 --out f   （取局部，供肉眼/vision 复核）
+//   node tools/art_check.mjs style     <img> [--ref <参考图>] [--step N] [--expect-ratio 16:9]
+//                                       画风量化（笔触密度/平坦度）；--ref 判定是否同一画风，
+//                                       --expect-ratio 才校验宽高比（默认不校验，因为 16:9 只是
+//                                       标题底图的专有要求，信纸 letter.png 本是 4:3）
 //
-// 退出码：0 = 通过 / 1 = 未通过（grid 条数不符、palette 偏离锚点）/ 2 = 用法或解码错误
+// 退出码：0 = 通过 / 1 = 未通过（grid 条数不符、palette 偏离锚点、style 与参考图不同族或比例超差）/ 2 = 用法或解码错误
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -799,6 +803,112 @@ function cmdCrop(img, opt) {
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
+// style —— 画风（笔触密度 / 平坦度）量化，可对比参考图
+// ═════════════════════════════════════════════════════════════════════════════
+//
+// 用途：判断"新图与在用的图是不是同一画风"。起因（2026-10-12）：标题页 main.png 是水墨风、
+// 主界面 main_bg.png 是像素插画风，两张不是一族，而**肉眼看截图容易吵不清**，于是把它变成数字。
+//
+// 判据来自实测：main.png 平均相邻差 11.1/765、平坦区 15.8%；main_bg.png 5.8、37.3%。
+// 「平均相邻差」= 左右相邻像素的 |ΔR|+|ΔG|+|ΔB| 均值（上限 765）—— 它直接反映"笔触密度"：
+// 满屏笔触的水墨远高于大面积平坦色块的插画风。
+//
+// 采样：三条固定相位（绝对坐标 stride 起步），保证两张图量的是同一批相对位置。
+
+function styleMetrics(img, step) {
+  const { width: W, height: H, data } = img;
+  if (step === undefined) step = Math.max(1, Math.round(Math.sqrt((W * H) / 120000)));
+  let sumDiff = 0, n = 0, flat = 0, mid = 0, big = 0;
+  let sr = 0, sg = 0, sb = 0, nColor = 0;
+  const colors = new Set();
+  for (let phY = 0; phY < 3; phY++) {
+    const y0 = Math.min(H - 2, Math.round((phY + 1) * H / 4));
+    for (let phX = 0; phX < 3; phX++) {
+      const x0 = Math.min(W - 2, Math.round((phX + 1) * W / 4));
+      for (let x = x0; x + 1 < W; x += step) {
+        const o = (y0 * W + x) * 4, p = o + 4;
+        const df = Math.abs(data[o] - data[p]) + Math.abs(data[o + 1] - data[p + 1]) + Math.abs(data[o + 2] - data[p + 2]);
+        sumDiff += df; n++;
+        if (df <= 2) flat++; else if (df >= 90) big++; else mid++;
+        if (phX === 0) { // 顺带统计整体色偏，只取第一条相位避免重复计数
+          sr += data[o]; sg += data[o + 1]; sb += data[o + 2]; nColor++;
+          if (colors.size < 5000) colors.add((data[o] << 16) | (data[o + 1] << 8) | data[o + 2]);
+        }
+      }
+    }
+  }
+  // ⚠️ 颜色必须用自己的计数 nColor 求均值。
+  // 曾用 `ceil(n/3)` 代替，因 ceil 向上取整会**大于**实际累加次数 → 均值偏大，
+  // 实测出现 R=278（>255）这种不可能的值。教训：算出来的数超出值域时，
+  // 先怀疑分母，别急着 clamp —— clamp 会把 bug 藏起来。
+  const cl = (v) => Math.max(0, Math.min(255, Math.round(v / Math.max(1, nColor))));
+  return {
+    W, H, step, n,
+    meanDiff: sumDiff / Math.max(1, n),
+    flat: flat / Math.max(1, n),
+    mid: mid / Math.max(1, n),
+    big: big / Math.max(1, n),
+    meanColor: [cl(sr), cl(sg), cl(sb)],
+    colors: colors.size,
+  };
+}
+
+function cmdStyle(img, opt) {
+  const stepRaw = opt.step === undefined || opt.step === true ? undefined : Number(opt.step);
+  if (stepRaw !== undefined && !Number.isFinite(stepRaw)) { console.error('--step 需要数字'); return 2; }
+  const m = styleMetrics(img, stepRaw);
+  const ratio = m.W / m.H;
+
+  console.log(`文件        ${img.name}`);
+  console.log(`尺寸        ${m.W} × ${m.H}   宽高比 ${ratio.toFixed(4)}`);
+  console.log(`采样        step=${m.step}  样本 ${m.n}`);
+  console.log(`平均相邻差  ${m.meanDiff.toFixed(1)} / 765      ← 笔触密度；越小越"平"`);
+  console.log(`平坦区≤2    ${pct(m.flat)}      硬边≥90 ${pct(m.big)}`);
+  console.log(`平均色      ${hex(m.meanColor[0], m.meanColor[1], m.meanColor[2])}   色种数 ${m.colors >= 5000 ? '≥5000' : m.colors}`);
+
+  let code = 0;
+
+  // 宽高比只在显式要求时判定。
+  // 为什么默认不判：16:9 是**标题底图专有**的要求（那张图 stretch_mode=0 会被拉伸），
+  // 而 letter.png 是 4:3 且由 KEEP_ASPECT_CENTERED 承载 —— 对它报"偏离 16:9"是误报。
+  if (opt['expect-ratio'] && opt['expect-ratio'] !== true) {
+    const parts = String(opt['expect-ratio']).split(':').map(Number);
+    if (parts.length !== 2 || !parts.every(Number.isFinite) || parts[1] === 0) {
+      console.error('--expect-ratio 需要形如 16:9'); return 2;
+    }
+    const want = parts[0] / parts[1];
+    const dev = Math.abs(ratio - want) / want;
+    if (dev > 0.01) {
+      console.log(`⚠️ 宽高比偏离 ${parts[0]}:${parts[1]} 达 ${pct(dev, 2)} —— 期望 ${want.toFixed(4)}，实际 ${ratio.toFixed(4)}`);
+      console.log(`   （title_screen.tscn 的 stretch_mode=0 会拉伸变形；1.6 → 10%、1.5 → 15.6%）`);
+      code = 1;
+    } else {
+      console.log(`✅ 宽高比在 ${parts[0]}:${parts[1]} 容差内（偏差 ${pct(dev, 2)} ≤ 1%）`);
+    }
+  }
+
+  if (opt.ref && opt.ref !== true) {
+    let ref;
+    try { ref = loadImage(String(opt.ref)); } catch (e) { console.error(`✗ 参考图读取失败: ${e.message}`); return 2; }
+    const r = styleMetrics(ref, stepRaw);
+    console.log('');
+    console.log(`与参考图对比  ${ref.name}`);
+    console.log(`  平均相邻差  ${r.meanDiff.toFixed(1)}  →  ${m.meanDiff.toFixed(1)}   (比值 ${(m.meanDiff / r.meanDiff).toFixed(2)}×)`);
+    console.log(`  平坦区      ${pct(r.flat)}  →  ${pct(m.flat)}`);
+    // "同族"判据：平均相邻差落在参考的 0.6~1.6 倍，且平坦区绝对差 < 12 个百分点
+    const ratioOK = m.meanDiff / r.meanDiff >= 0.6 && m.meanDiff / r.meanDiff <= 1.6;
+    const flatOK = Math.abs(m.flat - r.flat) < 0.12;
+    if (ratioOK && flatOK) {
+      console.log(`  ✅ 与参考图**同族**（相邻差在 0.6~1.6 倍内，平坦区差 ${pct(Math.abs(m.flat - r.flat))} < 12%）`);
+    } else {
+      console.log(`  ⚠️ 与参考图**不同族**：${!ratioOK ? `相邻差比值 ${(m.meanDiff / r.meanDiff).toFixed(2)}× 超出 0.6~1.6` : ''}${!flatOK ? ` 平坦区差 ${pct(Math.abs(m.flat - r.flat))} ≥ 12%` : ''}`);
+      code = 1;
+    }
+  }
+  return code;
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
 // main
 // ═════════════════════════════════════════════════════════════════════════════
 
@@ -810,7 +920,7 @@ DEBUG = !!opt.debug;
 if (!cmd || cmd === 'help' || cmd === '--help' || opt.help) { usage(); process.exit(0); }
 if (!opt._.length) { console.error('缺少图片路径。用 `node tools/art_check.mjs` 看用法。'); process.exit(2); }
 
-const COMMANDS = { info: cmdInfo, palette: cmdPalette, grid: cmdGrid, watermark: cmdWatermark, crop: cmdCrop };
+const COMMANDS = { info: cmdInfo, palette: cmdPalette, grid: cmdGrid, watermark: cmdWatermark, crop: cmdCrop, style: cmdStyle };
 if (!COMMANDS[cmd]) { console.error(`未知命令 "${cmd}"。可选：${Object.keys(COMMANDS).join(' / ')}`); process.exit(2); }
 
 let code = 0;
