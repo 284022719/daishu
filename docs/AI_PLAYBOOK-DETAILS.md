@@ -47,7 +47,7 @@ grep pattern="deprecated|removed in 4\." path=D:\个人项目\daishu\godot-docs\
 | 开发路线图与已知风险 | `docs\DEV_PLAN.md` |
 | 美术方向 / 色板 / 生成提示词 | `docs\ART_PLAN.md`、`docs\ART_BASELINE_ROUND1.md` |
 | 美术素材校验工具 + 提示词 JSON | `tools\art_check.mjs`、`data\art_prompts_round*.json` |
-| 给 AI 助手的项目约定 | `CLAUDE.md` |
+| **给 AI 助手的项目规则（唯一入口）** | `AGENTS.md` |
 
 ## 本机踩坑（完整版）
 
@@ -113,11 +113,27 @@ console exe 的完整路径：
 `D:\Program Files\Godot_v4.6.1-stable_mono_win64\Godot_v4.6.1-stable_mono_win64_console.exe`。
 ⚠️ 新路径**含空格**：这些引用点要么用引号整体包起来、要么作为 `spawn` 的参数传入（不经 shell），
 所以空格安全 —— 但**别**把它拼进一条未加引号的命令行。
-**引用这个路径的地方共 6 处**（2026-10-11 逐处核对），升级 Godot 版本或再搬目录时要一起改：
-两个 profile 的 `cordis.patch.yml`（`mcp-godot` 的 `GODOT_PATH`）、
-`D:\个人项目\daishu\.claude\mcp.json`、`D:\个人项目\daishu\.claude\settings.local.json`（3 条权限项）、
-`D:\个人项目\daishu\.vscode\settings.json` 的 `godotTools.editorPath.godot4`、以及 Godot 自带的
-`godot.cmd` / `godot-console.cmd`（这两个已由搬移脚本同步改好）。
+**引用这个路径的地方（2026-10-12 重新实测，含被 gitignore 的文件）**，
+升级 Godot 版本或再搬目录时要一起改。仓库内共 **6 个文件 / 9 处**：
+
+| 文件 | 处数 | 备注 |
+|---|---|---|
+| `.claude\settings.local.json` | 3 | **未跟踪、本地文件**（权限项）|
+| `docs\AI_PLAYBOOK-DETAILS.md` | 2 | 本文件（含本节）|
+| `.claude\mcp.json` | 1 | **未跟踪 + 被 gitignore**；由 `tools\setup-godot-mcp.ps1` 生成 |
+| `.vscode\settings.json` | 1 | `godotTools.editorPath.godot4` |
+| `AGENTS.md` | 1 | 第 3 节的命令示例 |
+| `docs\项目总览.md` | 1 | 第 4 节 |
+
+仓库**之外**另有 **4 处**（升级时同样要改）：
+
+- 两个 profile 的 `cordis.patch.yml`（`mcp-godot` 的 `GODOT_PATH`）——
+  这是 DSH 实际使用的接线，`.claude\mcp.json` 那条**已不再被任何工具读取**
+  （2026-10-12 起不再使用 Claude Code；脚本仍会生成它，属无害残留）。
+- **引擎自带的两个 `.cmd` 包装器**（实测存在，各写死 1 处路径）：
+  `Godot_v4.6.1-stable_mono_win64\godot.cmd` 与 `godot-console.cmd`。
+  它们让引擎像"PATH 上有个 godot 命令"一样可调用（项目里 `godot --path .` 这类用法靠它），
+  **搬目录时最容易漏改** —— 改完记得在裸 shell 里验一次 `godot --version`。
 
 ### 6. 美术素材必须像素级校验，禁止目测
 

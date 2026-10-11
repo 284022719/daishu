@@ -60,7 +60,7 @@ whenToUse: 任务涉及 Godot 引擎 / GDScript / 场景 / 节点 / 信号 / 资
 | 判定计费逻辑 | `docs\JUDGE_SYSTEM_LOGIC.md` |
 | 平衡数值 / 路线图与已知风险 | `docs\BALANCE_REPORT.md`、`docs\DEV_PLAN.md` |
 | 美术方向 / 色板 / 生成提示词 / 素材校验 | `docs\ART_PLAN.md`、`docs\ART_BASELINE_ROUND1.md`、`tools\art_check.mjs` |
-| 给 AI 助手的项目约定 | `CLAUDE.md` |
+| **给 AI 助手的项目规则（唯一入口）** | `AGENTS.md` |
 
 **代码为准**：文档与实现冲突时以实际实现为准（`docs\readme.md` 曾长期滞后，2026-09 校正过一次），
 并顺手把文档改对。
