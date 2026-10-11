@@ -1,11 +1,16 @@
-# 标题底图重做作业单（`main.png` → 像素插画风）
+# 画风统一作业单（**水墨风方向**，2026-10-12 修订）
 
-> **这份是给人生图用的作业单**：照抄提示词 → 出 4~6 张 → 按判据挑一张 → 交给我接入。
-> 方案背景与取舍见 `ART_PLAN.md` §二·五。
+> 本文件最初是为「标题底图 `main.png` → 像素插画风」建的（**方案 A**）。
+> **2026-10-12 用户改选水墨风**，方向随之调整：**保留 `main.png`（水墨）当锚点，
+> 改把主界面 `main_bg.png` 从像素风重做成水墨风**（即原方案 B）。
+> 原因：实测本机 SD 底模全是动漫/国风插画，**水墨是它们的强项，像素风是它们做不到的**（见 §0）。
 >
-> - 建单：2026-10-12
-> - **只出 1 张图**：标题背景 `main.png`
+> - 建单：2026-10-12 ｜ 修订：2026-10-12（改方向）
+> - **只出 1 张图**：主界面背景 `main_bg.png`
 > - 目的：**统一画风**（**不是**去水印 —— 水印那轮已解决）
+> - 锚点：现有 `main.png`（相邻差 12.1 / 平坦区 14.0% / 平均色 `#a29a81`）
+> - 好消息：`main.tscn` 用的是 `stretch_mode = 5`（KEEP_ASPECT_CENTERED）
+>   —— **比例不符只会留黑边，不会变形**（比标题页 `stretch_mode=0` 安全）
 
 ---
 
@@ -20,58 +25,90 @@
 | 位置 | `D:\绘世启动器`（SD WebUI v1.10.1）|
 | 便携 Python | `D:\绘世启动器\.ext\python.exe`（3.10.11，**依赖完整**，无需建 venv）|
 | GPU | RTX 2060 SUPER **8GB**（`torch 2.3.1+cu121`、`xformers 0.0.27`）|
-| 出图速度实测 | SDXL 1344×756 / 28 步 ≈ **36 秒/张**（一次 3 张用 108 秒）|
+| 出图速度实测 | SDXL 1152×648 / 28 步 ≈ **24 秒/张**；SD1.5 国风 ≈ **13 秒/张** |
 | 已验证 | API 可调（`/sdapi/v1/txt2img`），出图落盘正常 |
 
-**但——`--no-download-sd-model` 与下面的事实导致"出一张能用的图"卡在底模上：**
+### 实测（一）：像素风方向 —— 本机**做不到**
 
-| 本机已装底模 | 类型 | 与本项目 `main_bg.png` 的实测距离 |
-|---|---|---|
-| `Illustrious-XL-v2.0` | 动漫插画 | 相邻差 **32.2**（基准 6.3）= **5.07×** |
-| `waiIllustriousSDXL_v170` | 动漫插画 | 同类 |
-| `autismmixSDXL_autismmixConfetti` | 动漫插画 | 同类 |
-| `v1-5-pruned-emaonly` | SD1.5 通用 | 太弱，出不了风格 |
-| `国风武侠Chinese style.ckpt` | SD1.5 国风 | 非像素风 |
+已装底模全为动漫/国风。用 `art_check style` 量化（基准 `main_bg.png` 相邻差 6.3）：
 
-**实测三张 SDXL 出图 vs 项目基准 `main_bg.png`**：
-
-| | 平均相邻差 | 硬边 ≥90 | 与基准比值 |
+| 出图 | 相邻差 | 与基准比值 | 硬边 |
 |---|---|---|---|
-| 基准 `main_bg.png` | **6.3** | **0.1%** | — |
-| 出图 ① | 32.2 | **9.2%** | 5.07× |
-| 出图 ② | 30.2 | 8.7% | 4.76× |
-| 出图 ③ | 34.2 | 11.9% | 5.39× |
+| 基准 `main_bg.png` | 6.3 | — | **0.1%** |
+| 本机出图 ①②③ | 30~34 | **4.8~5.4×** | **8.7~11.9%** |
 
-**相邻差是基准的 5 倍、硬边是 90 倍。** 这不是"风格略不同"，是**完全不同的渲染方式**：
-本机模型给的是"**抖动噪点**"，项目 `main_bg.png` 要的是"**大面积平坦色块 + 极低硬边**"。
+相邻差 5 倍、硬边 **90 倍** —— 是"抖动噪点"而非"平坦色块"。
+且提示词 `upper-center empty for a title` **对动漫底模无效**：三张的上中全被楼阁占满。
 
-**另一个坑**：提示词里的 `leaves the upper-center empty (plain sky) for a title` **对动漫底模基本无效** ——
-三张出图的上中部全被楼阁/塔占满（正是标题要放的位置），选图阶段直接淘汰。
+### 实测（二）：水墨风方向 —— 风格能做，**内容不达标**（12 张正式尺寸全废）
 
-**结论**：卡点**不是算力，是缺一个像素风/扁平插画底模**（项目底图当初用的 `Anything XL` 本机已不在，
-`D:\anythingxl\` 里只有个 streamlit 演示、没有模型权重）。
-**所以作业单仍然成立**，出图这一步要么换底模，要么用外部工具。
+用户改选水墨方向后，我用 `国风武侠Chinese style`（SD1.5）与 SDXL 出了 **12 张 1152×648**，
+**逐张目视复核**。结论明确：
 
-**若换成"我来自动出图"**，需要先解决底模，从易到难：
-1. **你指定一个本机已有的模型**，我照着出（但上表说明现有的都不合适）
-2. **你提供一个像素风底模**（放进 `D:\绘世启动器\models\Stable-diffusion\`），我全程自动出图 + 跑判据 + 挑图
-3. **放开 huggingface / civitai 的网络访问**，我下载一个像素风底模（**这需要你改策略，我不自行申请**）
+| 方案 | 数值判据 | 目视 | 失败原因 |
+|---|---|---|---|
+| 内景 + 书案（英文）| 比值 1.16 ✅ | ❌ | **画面里有一个人物伏案写字** —— 主界面是"玩家当先生"，画里别人在写字语义不对，且人物压在 UI 面板区 |
+| 内景 + 书案（中文）| 比值 **1.19** ✅ | ❌ | **画成三个动漫人物**（武侠语料带偏）；蓝金高饱和，与目标 `#a29a81` 暖灰完全不同 |
+| 空场景（v2）| 比值 0.82 ✅ | ❌ | **过度纠正**：出成一排空白纸/木板，"书信铺"不成立 |
+| 内景 v3 | 比值 1.26 | ❌ | 结构发闷 + **紫色/品红伪影**（VAE 解码不良）|
+| 纸本 + 淡墨 | 比值 **0.92** ✅ | ❌ | **纸上出现书法字 + 红色印章** —— 触发 §一 硬规矩（禁文字）|
+| 纸本（其余 2 张）| 0.73 / 1.16 | ❌ | 过亮、硬线、或近乎全空 |
+
+⚠️ **必须记住的教训：数值判据会给出假阳性。**
+`art_check style` 只量"笔触密度/平坦度"，**不看画面内容** ——
+那张"三个动漫人物"的图拿了**最好的数值之一（1.19×）**，仍被判"✅ 同族"。
+**判据是"画风一致"的必要条件，不是充分条件；每张仍须人眼复核内容与文字。**
+
+**根本卡点**：本机全部底模（`Illustrious-XL`、`waiIllustrious`、`autismmixSDXL`、`国风武侠`）
+的语料是**动漫/武侠人物插画**，与项目要的"**空无一人的明代文书铺内景**"不匹配 ——
+提示词里写多少遍 `no people` / `空无一人` 都压不住（实测至少 3 轮）。
+项目底图当初用的 `Anything XL` 本机已不在（`D:\anythingxl\` 只有 streamlit 演示、无权重）。
+
+**证据（已入库，可直接打开看，不必听我说）**：
+
+| 文件 | 说明 |
+|---|---|
+| `docs/screenshots/regen_ink_anchor_main.png` | 锚点：现有 `main.png`（水墨街景，目标风格）|
+| `docs/screenshots/regen_ink_with_people.png` | 数值最好但画了动漫人物（**假阳性证据**）|
+| `docs/screenshots/regen_ink_best_scene.png` | 场景成立但画质崩 + 紫色伪影 |
+| `docs/screenshots/regen_ink_paper_best.png` | 最好看但**带书法字 + 红印章**（禁文字硬规矩）|
+
+**结论**：本机 SD **能出图、风格也能对**，但**这些底模出不了"无人 + 无文字 + 结构成立"的内景**。
+**若改为"我来自动出图"**，先解决底模，从易到难：
+1. **你提供一个底模**（水墨插画风，放进 `D:\绘世启动器\models\Stable-diffusion\`），
+   我全程自动出图 + 跑判据 + **逐张目视复核** + 接入
+2. **放开 huggingface / civitai 的网络访问**，我下载合适底模（**这需要你改策略，我不自行申请**）
+3. 你指定本机已有的某个底模，我照着出（但上表说明现有的都不合适）
 
 ---
 
 ## 1. 要解决的问题（一句话）
 
 标题页 `main.png` 是**水墨风**、主界面 `main_bg.png` 是**像素插画风**，两张不是一族。
-实测 `style` 判据：**相邻差比值 1.91×（超出同族阈值 1.6×）**。
+实测 `style` 判据：**相邻差比值 1.91×**（同族阈值 0.6~1.6×）。
 
-离群者是**标题页**，不是主界面 —— 信纸 `letter.png` 与主界面实测同族（比值 0.91×）。
-**所以只换这一张，三张就同族了。**
+**两种走法（2026-10-12 定案：走水墨）**：
+
+| 走法 | 做什么 | 状态 |
+|---|---|---|
+| 像素风（原方案 A）| 重做 `main.png` 成像素风 | ❌ **已放弃** —— 本机底模做不到（§0 实测：相邻差 5 倍、硬边 90 倍）|
+| **水墨风（当前）** | **重做 `main_bg.png` 成水墨风，`main.png` 留作锚点** | ✅ **已选**（本文件按这个方向写）|
+
+**水墨方向的实测基础**：本机 `国风武侠Chinese style` / SDXL 底模出图，
+与锚点 `main.png` 的距离能到 **1.16~1.26×**（原像素风是 1.91×）—— **风格上已经进圈**。
+**但内容全部不达标**（出人物 / 出文字 / 出印章 / 结构崩），详见 §0 实测（二）。
+
+**当前真正卡住的不是风格，是内容**：需要"**空无一人的明代文书铺内景 + 无任何文字**"，
+而本机底模的语料是动漫/武侠人物插画，压不住。
 
 ---
 
-## 2. 提示词（直接粘贴）
+## 2. 提示词（水墨风；已实测三轮，附失败记录）
 
-### 2.1 正面提示词
+> ⚠️ 下面 §2–§4 保留的是**原像素风方向**的提示词与参数（已被本机实测否决，见 §0），
+> **不要照它出图**。水墨风当前可用提示词与三轮演进记录见 §11。
+
+### 2.1 正面提示词（❌ 已否决，仅存档）
 
 ```
 16-bit pixel art, morning street in a Ming dynasty town, a poor scholar with a small
@@ -320,3 +357,56 @@ D:\dsh\tmp\hfcache\hub\models--openai--clip-vit-large-patch14\
   会让人误以为前面的逻辑失败**（实际前面已经成功）。
 - **`Start-Process -FilePath 'node'` 静默失败**：Windows 上 `node` 不是可执行文件名，
   要用 `(Get-Command node).Source` 拿绝对路径，否则进程起不来、输出 0 字节。
+
+---
+
+## 11. 水墨风：当前提示词与三轮演进（实测，别退回旧版）
+
+**目标**：把 `main_bg.png`（主界面底图）改成与 `main.png` 同族的水墨风。
+**硬约束**：① 空无一人（玩家才是代笔先生）；② **无任何文字/印章**（`ART_PLAN` §一）；
+③ 画面中部要有大片低细节区（UI 面板半透明 alpha 0.78，压在细密线条上会读不清）。
+
+### 当前提示词（v3，可直接粘贴）
+
+**正面**：
+
+```
+traditional Chinese ink wash painting (shuimo), xuan paper texture, interior of a Ming
+dynasty letter-writing shop, an unattended wooden desk in the lower part of the frame with
+writing brushes, an inkstone and stacked rice paper, blank paper sheets hanging on the
+wall, empty room with no people, soft ink brushstrokes, muted warm earth tones, subtle
+color wash, low contrast, uncluttered composition, large plain low-detail wall area in the
+middle of the frame for UI panels, no text, no watermark, no signature
+```
+
+**负面**（分层写，每一层都是实测加上的）：
+
+```
+text, letters, characters, watermark, signature, logo, brand,
+calligraphy, handwriting, writing, inscription, chinese characters, kanji,
+typed text, captions, labels, posters, newspaper,
+person, people, human, figure, portrait, face, hands,
+photorealistic, 3d render, modern style, anime, high saturation, blurry, noise,
+oil painting, thick impasto, purple fringing, chromatic aberration
+```
+
+**参数**：`1152×648` / `28` 步 / `cfg 7` / `DPM++ 2M Karras`
+**底模**：`国风武侠Chinese style`（SD1.5，约 13 秒/张）或 `waiIllustriousSDXL_v170`（SDXL，约 24 秒/张）
+
+### 三轮演进（**失败记录也是资产**，别退回旧版）
+
+| 版本 | 提示词要点 | 数值判据 | 目视结果 |
+|---|---|---|---|
+| v1 | 内景 + 书案 + 信纸 | 1.16× | 构图对（书案/信纸/格架能认出来），**但出了人物伏案写字**，细节偏密 |
+| v2 | 加"空无一人 / 刻意稀疏" | **0.82×**（最平）| **过度纠正**：出成一排空白纸/木板，**场景不成立** |
+| **v3** | **以 v1 的实体描述为主干**，只把"无人"当约束加进去 | 1.26× | 场景成立、无人物，但结构发闷 + 有紫色伪影 |
+
+**方法论教训**：v2 说明"**只加否定约束会把实体描述一起冲掉**" ——
+措辞要**保留正向的实体描述**（内景/书案/毛笔/信纸），把"不要"作为附加约束，而不是让画面变空。
+
+### 另一个方向（数值好但内容废）：极简纸本
+
+提示词 `traditional Chinese ink wash painting on xuan paper, plain rice paper background ...
+a faint suggestion of a wooden desk edge along the bottom ...`
+—— 数值最优（**比值 0.92**、平坦区 29%、平均色 `#dcd1b8`），**但纸上被画了书法字 + 红印章**，
+直接违反禁文字硬规矩。**失败模式温和**（最差是"一片纸"），如果哪天需要一个纯纸底，这条路值得再调。
