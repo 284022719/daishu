@@ -2,6 +2,15 @@ godot-mcp/
 .claude/mcp.json
 .godot/
 
+# Godot 官方文档语料（2026-10-11 从 D:\godot-docs 迁入）
+# 第三方语料 + 自带 .git（嵌套仓库），36 MB；由 AI 工具链按需重取，不进本项目版本控制。
+godot-docs/
+
+# Godot 的自动生成伴生物（跑 --import 时会给 docs\ 下的配图也生成 .import，
+# 给 tools\*.gd 重新生成 .uid）—— 都不是源码，别进仓库
+docs/screenshots/*.import
+tools/*.uid
+
 # Godot 导出产物（构建输出，不进版本控制）
 export/
 *.pck

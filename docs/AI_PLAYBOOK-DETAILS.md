@@ -131,16 +131,22 @@ SCRIPT ERROR: Invalid call. Nonexistent function 'gui_get_drag_preview' in base 
 
 ### 升级引擎（例如 4.7）—— 语料要跟着切分支
 
+⚠️ **先读这段再照抄命令**：语料是 `blob:none` 部分克隆，本地没有 blob 对象，`checkout` 会去
+gitcode.com 取 blob —— 本机代理拦 403 时直接失败（`could not fetch … from promisor remote`）。
+**要么先确认能连通 gitcode.com，要么改用"重新克隆到新目录"而不是原地切分支。**
+
 ```
-git -C D:\godot-docs fetch --depth 1 origin 4.7
-git -C D:\godot-docs checkout 4.7
+git -C D:\个人项目\daishu\godot-docs fetch --depth 1 origin 4.7
+git -C D:\个人项目\daishu\godot-docs checkout 4.7
 ```
 
 ### 需要恢复图片时（D 盘空间紧张，谨慎）
 
 ```
-git -C D:\godot-docs sparse-checkout set --no-cone "*.rst" "*.png" "*.svg"
+git -C D:\个人项目\daishu\godot-docs sparse-checkout set --no-cone "*.rst" "*.png" "*.svg"
 ```
+
+同样受上面的 blob 限制：**取图片必然要联网**（图片本来就没检出过）。
 
 ### 装导出模板（没有它就无法产出 exe）
 

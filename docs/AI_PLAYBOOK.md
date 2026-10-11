@@ -6,10 +6,15 @@ whenToUse: 任务涉及 Godot 引擎 / GDScript / 场景 / 节点 / 信号 / 资
 
 # 语料（第一依据 —— 别凭记忆写 API）
 
-- `D:\godot-docs`：gitcode 镜像的 godot-docs 仓库，**4.6 分支**（HEAD `b10b7ed`），纯文本稀疏检出
-  1568 篇 `.rst`（30.7 MB）。
+- `D:\个人项目\daishu\godot-docs`：gitcode 镜像的 godot-docs 仓库，**4.6 分支**（HEAD `b10b7ed`），
+  纯文本稀疏检出 1568 篇 `.rst`。
+  **2026-10-11 从 `D:\godot-docs` 迁入本项目目录**（见下方「语料的边界」）。
 - **版本锚点 4.6**：本机引擎 v4.6.1-stable (mono) 与文档同代。图片与动图**未检出**，正文里的图片链接指向
   `raw.githubusercontent.com`（本机访问不了）—— **不要追图片**。
+- **语料的边界（2026-10-11 实测，别误解它）**：这是 `blob:none` 的**部分克隆**，本地只有那个提交的树，
+  **没有 blob 对象**；`git status` / `git checkout` 会去 gitcode.com 取 blob，而本机代理拦 403 →
+  报 `could not fetch … from promisor remote`。所以它现在是**只读的纯文本语料**：
+  **拿它查文档可以，拿它切分支/回滚不行**（要切分支得先能连通 gitcode 或重新克隆）。
 
 # 目录地图
 
@@ -26,14 +31,14 @@ whenToUse: 任务涉及 Godot 引擎 / GDScript / 场景 / 节点 / 信号 / 资
 用 DSH 的 `grep` / `glob` / `read` 工具；**本机 shell 里没有 `rg`**，别在 pwsh 里拼 ripgrep。
 
 1. **查某个类**：先 `grep` 定位行号，再 `read` 该片段（类文件通常 300–3000 行）：
-   `grep pattern="move_and_slide|position" path=D:\godot-docs\classes\class_characterbody2d.rst`
+   `grep pattern="move_and_slide|position" path=D:\个人项目\daishu\godot-docs\classes\class_characterbody2d.rst`
 2. **不确定方法/信号/属性属于哪个类**（最有用的起手式）：
-   `grep pattern="^\.\. _class_\w+_method_move_and_slide:" path=D:\godot-docs\classes`
+   `grep pattern="^\.\. _class_\w+_method_move_and_slide:" path=D:\个人项目\daishu\godot-docs\classes`
    锚点规则是 `class_<类名>_(method|property|signal|constant|enum)_<名字>`，把 `method` 换成
    `signal`/`property` 即可反查信号与属性。
 3. **查主题做法**（拖放 / 存档 / 相机跟随 / 状态机）：
-   `grep pattern="drag and drop" path=D:\godot-docs\tutorials`，命中后读对应 rst。
-4. **查废弃与版本迁移**：`grep pattern="deprecated|removed in 4\." path=D:\godot-docs\tutorials\migrating`。
+   `grep pattern="drag and drop" path=D:\个人项目\daishu\godot-docs\tutorials`，命中后读对应 rst。
+4. **查废弃与版本迁移**：`grep pattern="deprecated|removed in 4\." path=D:\个人项目\daishu\godot-docs\tutorials\migrating`。
 
 **类参考结构**：`.. _class_Node2D_method_apply_scale:` + `|void| **apply_scale**(…)`；
 `:ref:`X<class_X>`` 括号里的类型名（转小写）就是下一个能查的文件；章节顺序
