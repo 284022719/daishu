@@ -76,9 +76,28 @@
 godot --path . --script res://tools/capture_letter.gd -- --out <路径.png>
 ```
 
-### ④ 词库区 `WordPanel` 背景透明
+### ④ 词库区 `WordPanel` 背景透明 ✅ 已修（2026-10-11）
 
-`letter.tscn` 的 `WordPanel`（左侧词库区）是 `type="Panel"` 无自定义样式 —— 词库按钮**直接压在信纸底图的花纹上**，既看不清也难看。`ART_PLAN.md` 已把「词库区底板 355×~600」列为**缺失待新增**。
+`letter.tscn` 的 `WordPanel`（左侧词库区）原本是 `type="Panel"` + `StyleBoxEmpty`，即**完全透明** —— 词库按钮直接压在背景上，既看不清边界也不像"呈放文书的案盘"。
+
+**已采取的修复**：
+
+- 新增 `StyleBoxFlat_wordpanel`：暖褐底（`Color(0.905,0.843,0.741,0.78)`）+ 棕褐描边 + 6px 圆角，取自 `ART_PLAN.md` §二 的"木构/家具"色板（`#9c5424`/`#b46c3c`）
+- 词库按钮一并改色：暖纸底（`Color(0.976,0.949,0.878,0.92)`）+ 墨褐字（`Color(0.235,0.176,0.098)`），
+  悬停/按下有独立配色，取代原先的 Godot 默认冷灰按钮 —— 冷灰压在暖褐底板上有明显色偏
+- 按钮样式在 `scripts/letter.gd` 的 `_style_word_button()` 里以代码构建（按钮是运行时 `Button.new()` 出来的，无法在场景里预设）
+
+**同时修正的一处交互细节**：槽位放下词之后**不再显示虚线边框**（`letter_slot.gd` 的 `_draw()` 增加 `if _has_word: return`）。
+虚线是"这里可以放东西"的提示，放好了就该收掉；否则五个虚线框会一直和书法字抢视线。
+
+**功能回归验证**：新增 `tools/verify_drop.gd`，模拟把五个正确词分别投放到五个槽位，断言
+「槽位接受 → 文字更新 → 字色为墨色 → `player_answers` 同步 → `JudgeSystem.judge()` 返回 PERFECT」。
+实测 `result_code = PERFECT`、`fee = 20`，**样式改动未破坏拖拽与判定**。
+
+```bash
+godot --path . --script res://tools/verify_drop.gd
+godot --path . --script res://tools/verify_drop.gd -- --shot out.png   # 顺便截"已填好"的图
+```
 
 ---
 
@@ -111,7 +130,7 @@ godot --path . --script res://tools/capture_letter.gd -- --out <路径.png>
 
 1. **重生成 `letter.png`**（无水印 + 12 栏网格）→ 测栏线 → 重锚 4 槽位 → 像素复核
 2. ~~给 4 个槽位加可放置视觉~~ ✅ 已完成（`a96a86a`）
-3. **给 `WordPanel` 加底板**
+3. ~~给 `WordPanel` 加底板~~ ✅ 已完成（含词库按钮配色）
 4. **裁掉或重生成 `main.png` / `main_bg.png` 的右下角水印**
 5. **接入毛笔光标**（直接用归档件，缩放即可）
 6. **定义全局 Theme**：中文字体 + 按钮九宫格（一次改动，六个场景同时受益）

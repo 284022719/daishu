@@ -19,6 +19,22 @@ corner_radius_top_right = 3
 corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wordpanel"]
+content_margin_left = 10.0
+content_margin_top = 10.0
+content_margin_right = 10.0
+content_margin_bottom = 10.0
+bg_color = Color(0.905, 0.843, 0.741, 0.78)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.549, 0.322, 0.141, 0.55)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
 [node name="Letter" type="Control" unique_id=1343437158]
 layout_mode = 3
 anchors_preset = 15
@@ -62,7 +78,7 @@ split_offset = 355
 
 [node name="WordPanel" type="Panel" parent="HSplit" unique_id=837201446]
 layout_mode = 2
-theme_override_styles/panel = SubResource("4_transparent")
+theme_override_styles/panel = SubResource("StyleBoxFlat_wordpanel")
 
 [node name="WordVBox" type="VBoxContainer" parent="HSplit/WordPanel" unique_id=330910408]
 layout_mode = 1

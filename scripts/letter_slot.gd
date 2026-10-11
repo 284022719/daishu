@@ -54,6 +54,9 @@ func _on_resized() -> void:
 	queue_redraw()
 
 func _draw() -> void:
+	# 已放词的槽位不再画虚线：虚线是"这里可以放东西"的提示，放好了就该收掉
+	if _has_word:
+		return
 	var r := Rect2(Vector2.ZERO, size)
 	var top_left := r.position
 	var top_right := r.position + Vector2(r.size.x, 0)
@@ -102,6 +105,7 @@ func _drop_data(_at_position: Vector2, data) -> void:
 		text_label.add_theme_color_override("font_color", FILLED_COLOR)
 	# 放下后给予轻微“选中”反馈
 	modulate = Color(0.95, 1.0, 0.95)
+	queue_redraw()
 	word_dropped.emit(slot_key, word)
 
 func _on_mouse_entered() -> void:

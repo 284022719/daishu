@@ -21,6 +21,11 @@ extends Control
 @onready var result_label: RichTextLabel = $ResultPopup/ResultLabel
 
 const WORD_BUTTON_SCRIPT := preload("res://scripts/word_button.gd")
+# 词库按钮外观：暖纸底 + 墨色字，与左侧底板和信纸同一套色系（ART_PLAN §二）
+# 底/边框样式在 letter.tscn 的 StyleBoxFlat_wpbutton，颜色由 StyleBoxFlat 决定；
+# 这里只覆盖文字颜色与悬停/按下的文字色。
+const WORD_BUTTON_TEXT := Color(0.235, 0.176, 0.098, 1.0)
+const WORD_BUTTON_TEXT_HOVER := Color(0.549, 0.322, 0.141, 1.0)
 # 信纸毛笔字体（从 assets/fonts/hanchanlongcang.otf 加载）
 const LETTER_FONT_PATH := "res://assets/fonts/hanchanlongcang.otf"
 const LETTER_FONT_SIZE := 22
@@ -159,7 +164,31 @@ func _add_word_button(parent: Node, text: String, category: String, body_slot: S
 	btn.text = text
 	btn.category = category
 	btn.body_slot = body_slot
+	_style_word_button(btn)
 	parent.add_child(btn)
+
+# 给词库按钮套暖纸底样式（与左侧 WordPanel 底板、信纸同色系）
+func _style_word_button(btn: Button) -> void:
+	var base := StyleBoxFlat.new()
+	base.bg_color = Color(0.976, 0.949, 0.878, 0.92)
+	base.border_color = Color(0.667, 0.478, 0.227, 0.5)
+	base.border_width_bottom = 2
+	base.set_corner_radius_all(4)
+	base.set_content_margin_all(6)
+
+	var hover := base.duplicate() as StyleBoxFlat
+	hover.bg_color = Color(1.0, 0.976, 0.914, 1.0)
+
+	var pressed := base.duplicate() as StyleBoxFlat
+	pressed.bg_color = Color(0.902, 0.851, 0.733, 1.0)
+
+	btn.add_theme_stylebox_override("normal", base)
+	btn.add_theme_stylebox_override("hover", hover)
+	btn.add_theme_stylebox_override("pressed", pressed)
+	btn.add_theme_stylebox_override("focus", hover)
+	btn.add_theme_color_override("font_color", WORD_BUTTON_TEXT)
+	btn.add_theme_color_override("font_hover_color", WORD_BUTTON_TEXT_HOVER)
+	btn.add_theme_color_override("font_pressed_color", WORD_BUTTON_TEXT_HOVER)
 
 func _on_slot_word_dropped(slot_key: String, word: String) -> void:
 	match slot_key:
