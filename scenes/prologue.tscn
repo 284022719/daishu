@@ -1,7 +1,23 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scripts/prologue.gd" id="1"]
 [ext_resource type="Texture2D" path="res://assets/images/backgrounds/prologue_bg.png" id="2_bg"]
+
+[sub_resource type="StyleBoxFlat" id="TextBacking"]
+bg_color = Color(0.988, 0.894, 0.706, 0.92)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.612, 0.329, 0.141, 0.6)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 28.0
+content_margin_top = 20.0
+content_margin_right = 28.0
+content_margin_bottom = 20.0
 
 [node name="Prologue" type="Control"]
 layout_mode = 3
@@ -23,27 +39,37 @@ texture = ExtResource("2_bg")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="TextBacking" type="Panel" parent="."]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -260.0
-offset_top = -180.0
-offset_right = 260.0
-offset_bottom = 180.0
+offset_left = -300.0
+offset_top = -175.0
+offset_right = 300.0
+offset_bottom = 175.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_styles/panel = SubResource("TextBacking")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TextBacking"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
 theme_override_constants/separation = 16
 
-[node name="StoryLabel" type="Label" parent="VBoxContainer"]
+[node name="StoryLabel" type="Label" parent="TextBacking/VBoxContainer"]
 layout_mode = 2
 text = "大明成化年间，你是一介贫寒书生。\n数年苦读，今科在即，却凑不齐进京赶考的路费。\n无奈之下，只得在集市口摆摊代写书信，赚取盘缠。\n你需要在10天内攒够500文钱，否则将错失科考……"
 autowrap_mode = 3
 
-[node name="ConfirmButton" type="Button" parent="VBoxContainer"]
+[node name="ConfirmButton" type="Button" parent="TextBacking/VBoxContainer"]
 layout_mode = 2
 text = "启程"
 

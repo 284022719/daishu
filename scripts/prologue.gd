@@ -1,6 +1,6 @@
 extends Control
 
-@onready var confirm_btn: Button = $VBoxContainer/ConfirmButton
+@onready var confirm_btn: Button = $TextBacking/VBoxContainer/ConfirmButton
 
 func _ready() -> void:
 	confirm_btn.pressed.connect(_on_confirm_pressed)

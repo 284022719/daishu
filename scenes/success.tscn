@@ -1,7 +1,23 @@
-[gd_scene load_steps=3 format=3 uid="uid://bhp1d6426fgei"]
+[gd_scene load_steps=4 format=3 uid="uid://bhp1d6426fgei"]
 
 [ext_resource type="Script" path="res://scripts/EndGameScreen.gd" id="1"]
 [ext_resource type="Texture2D" path="res://assets/images/backgrounds/ending_success.png" id="2_bg"]
+
+[sub_resource type="StyleBoxFlat" id="TextBacking"]
+bg_color = Color(0.988, 0.894, 0.706, 0.92)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.612, 0.329, 0.141, 0.6)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 28.0
+content_margin_top = 20.0
+content_margin_right = 28.0
+content_margin_bottom = 20.0
 
 [node name="SuccessScreen" type="Control"]
 anchors_preset = 15
@@ -22,33 +38,45 @@ texture = ExtResource("2_bg")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="TextBacking" type="Panel" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -420.0
+offset_top = -72.0
+offset_right = 420.0
+offset_bottom = 72.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("TextBacking")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TextBacking"]
+layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 80.0
-offset_top = 80.0
-offset_right = -80.0
-offset_bottom = -80.0
 grow_horizontal = 2
 grow_vertical = 2
+alignment = 1
 theme_override_constants/separation = 16
 
-[node name="MessageLabel" type="Label" parent="VBoxContainer"]
+[node name="MessageLabel" type="Label" parent="TextBacking/VBoxContainer"]
 layout_mode = 2
 text = "恭喜！你成功通过了十天的考验，进入下一关！"
 autowrap_mode = 3
 
-[node name="Buttons" type="HBoxContainer" parent="VBoxContainer"]
+[node name="Buttons" type="HBoxContainer" parent="TextBacking/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/separation = 16
 alignment = 1
 
-[node name="RestartButton" type="Button" parent="VBoxContainer/Buttons"]
+[node name="RestartButton" type="Button" parent="TextBacking/VBoxContainer/Buttons"]
 layout_mode = 2
 text = "重玩"
 
-[node name="QuitButton" type="Button" parent="VBoxContainer/Buttons"]
+[node name="QuitButton" type="Button" parent="TextBacking/VBoxContainer/Buttons"]
 layout_mode = 2
 text = "退出游戏"
 

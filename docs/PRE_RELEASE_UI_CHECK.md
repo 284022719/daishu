@@ -243,6 +243,33 @@ godot --path . --script res://tools/verify_drop.gd -- --shot out.png   # 顺便�
 - ⚠️ **仍待人眼定稿**：判据只能筛掉明显不合格，不能替代审美判断（详见 `ART_METHOD_FINDINGS.md` §三）。
 - ⚠️ 同批生成的 `main.png`（标题）**仍是水墨风**、与主界面不成套 —— 该项未动，见 `ART_PLAN.md` §二·五。
 
+### ⑩⑪ 的排版修复（同日，接入背景**之后**才显出来的问题）
+
+接入背景暴露了两个此前看不见的问题，都已修：
+
+| 问题 | 现象 | 修法 |
+|---|---|---|
+| **内容偏上** | 结局界面文字与按钮堆在顶部。根因：`VBoxContainer` 是 `anchors_preset=15`（全屏），子节点默认 `SIZE_FILL` 被拉伸顶到最上面 | `VBoxContainer` 改**居中锚点**固定宽高，并加 **`alignment = 1`**（`ALIGNMENT_CENTER`）让子节点在容器内居中 |
+| **文字看不清** | 深色背景（`gameover`）上**深色文字几乎不可读** —— 全局主题的 Label 是深墨色，是配合原本的浅色面板设计的，背景一换就失效 | 加 **`TextBacking`**（半透明宣纸色 `StyleBoxFlat`，`bg_color = Color(0.988,0.894,0.706,0.92)` + 细边框）作为文字底板 |
+
+实测验收（文字带中心的 y 坐标 vs 画面中心 324）：
+
+| 场景 | 修复前内容中心 | 修复后 | 偏差 |
+|---|---|---|---|
+| `success` | 贴顶（y≈95）| **321** | −3 |
+| `gameover` | 贴顶 | **324** | 0 |
+| `prologue` | 224.5（偏上 100px）| **321** | −3 |
+
+⚠️ **一次走错的路（记下来省得重走）**：我先试的是给子节点加 `size_flags_vertical = 4`
+（`SIZE_SHRINK_CENTER`）—— **实测完全无效**（改前改后截图**逐像素完全相同**、0 个不同像素）。
+真正的开关是**容器的 `alignment`**（`class_boxcontainer.rst:94-98,119-130`，`ALIGNMENT_CENTER = 1`）。
+
+⚠️ **顺带发现一个独立的字体问题（未修）**：`success` 的文案「得以赶赴科考」中
+**「以」显示成一个怪符号**。已查清**不是缺字形、也不是兜底失效** ——
+用 Pillow 直接以 `hanchanlongcang.otf` 渲染同样得到那个形状（字形墨迹占比 0.066，异常偏低）。
+即**寒蝉龙藏体这个字的设计本身就是这样**。证据见 `screenshots/failed/font_glyph_render.png`
+与 `font_glyph_yi_issue.png`。**要修得换字体或换文案**，属独立事项。
+
 ---
 
 ### ⑦⑧⑨ 的修复记录（本次）

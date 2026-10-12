@@ -110,6 +110,18 @@ whenToUse: 任务涉及 Godot 引擎 / GDScript / 场景 / 节点 / 信号 / 资
 18. **改 Markdown 章节后必须跑结构守卫，别靠眼睛**：**拿"标题行"当 edit 锚点**最容易漏写回旧标题，
     正文就成了"挂在上一节下面"的孤儿（内容都在，肉眼看着正常）。判据：**`node tools/md_structure_check.mjs
     <file.md>`**（本项目工具，带 `--selftest`）；插入章节**以正文首行当锚点**。
+19. **想让容器里的子节点"居中"，要改容器的 `alignment`，不是子节点的 `size_flags_vertical`**。
+    实测（2026-10-13）：给 `VBoxContainer` 的子节点加 `size_flags_vertical = 4`（`SIZE_SHRINK_CENTER`）
+    **完全无效** —— 改前改后截图**逐像素完全相同（0 个不同像素）**；真正生效的是
+    容器的 `alignment = 1`（`ALIGNMENT_CENTER`，`classes\class_boxcontainer.rst:94-98,119-130`）。
+    判据：内容偏上时先查该容器**有没有 `alignment`**。另：`size_flags_*` 的常量语义见
+    `classes\class_control.rst:955-993`（`SIZE_FILL=1` / `EXPAND=2` / `EXPAND_FILL=3` / `SHRINK_CENTER=4`）。
+20. **`--script` 探针里 Control 的布局算不出来（size 恒为 0）—— 这是观察方式的问题，不是布局坏了**。
+    实测（2026-10-13）：`SceneTree` 默认视口是 **100×100**，`instantiate()` 后所有 `Control`
+    报 `size=(0,0)`、`pos` 全是锚点位移，看着像"改动没生效"。判据：探针里**先 `get_root().size =
+    Vector2i(1152, 648)`** 再 `add_child`；即便如此，`--script` 下容器仍可能不排布 ——
+    **决定性判据是"截图逐像素比差异"**（`ImageChops.difference` 的 `getbbox()` 是否为 `None`），
+    而不是靠肉眼估 y 坐标。
 
 # 维护与导出
 

@@ -2,9 +2,9 @@ extends Control
 
 @export var is_success: bool = false
 
-@onready var message_label: Label = $VBoxContainer/MessageLabel
-@onready var restart_button: Button = $VBoxContainer/Buttons/RestartButton
-@onready var quit_button: Button = $VBoxContainer/Buttons/QuitButton
+@onready var message_label: Label = $TextBacking/VBoxContainer/MessageLabel
+@onready var restart_button: Button = $TextBacking/VBoxContainer/Buttons/RestartButton
+@onready var quit_button: Button = $TextBacking/VBoxContainer/Buttons/QuitButton
 
 func _ready() -> void:
 	if is_success:
