@@ -7,7 +7,9 @@ godot-docs/
 
 # Godot 的自动生成伴生物（跑 --import 时会给 docs\ 下的配图也生成 .import，
 # 给 tools\*.gd 重新生成 .uid）—— 都不是源码，别进仓库
-docs/screenshots/*.import
+# 注意：`*.import` 只匹配当前层，子目录要用 `**`（2026-10-13 实测：
+# docs/screenshots/concept/、restyle/ 等子目录的 .import 曾漏网）
+docs/screenshots/**/*.import
 tools/*.uid
 scripts/*.uid
 

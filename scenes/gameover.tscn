@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://bhv6o0qh2vqg2"]
+[gd_scene load_steps=3 format=3 uid="uid://bhv6o0qh2vqg2"]
 
 [ext_resource type="Script" path="res://scripts/EndGameScreen.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/images/backgrounds/ending_gameover.png" id="2_bg"]
 
 [node name="GameOverScreen" type="Control"]
 anchors_preset = 15
@@ -10,6 +11,16 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
 is_success = false
+
+[node name="Background" type="TextureRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_bg")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 anchors_preset = 15

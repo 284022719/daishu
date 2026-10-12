@@ -135,8 +135,8 @@ godot --path . --script res://tools/verify_drop.gd -- --shot out.png   # 顺便�
 
 | # | 问题 | 说明 |
 |---|---|---|
-| ⑩ | `success.tscn` / `gameover.tscn` **无任何贴图** | 两个结局界面是纯文字，缺结局背景。而结局是玩家情绪的最高点，最不该空 |
-| ⑪ | `prologue.tscn` **无任何贴图** | 序章只有一个空 Panel + 文字，缺背景（`ART_PLAN.md` 标为"可选"） |
+| ⑩ | ~~`success.tscn` / `gameover.tscn` **无任何贴图**~~ ✅ **已补并接入（2026-10-13）** —— 待目视定稿 | 两张结局背景已生成并接进场景，见下方"⑩⑪ 的现状" |
+| ⑪ | ~~`prologue.tscn` **无任何贴图**~~ ✅ **已补并接入（2026-10-13）** —— 待目视定稿 | 序章背景已生成并接入，见下方"⑩⑪ 的现状" |
 | ⑫ | ~~**毛笔光标未接入**~~ ⚠️ **部分完成（`0b3c34a`）** —— 实测结论与 ART_PLAN 的乐观说法不同，见下方订正 | `assets/images/ui/brush_cursor.png` |
 | ⑬ | ~~**标题缺「代书」书法大字**~~ ✅ **已完成** | `title_screen.tscn`，见下方"⑬ 的修复记录" |
 
@@ -224,16 +224,24 @@ godot --path . --script res://tools/verify_drop.gd -- --shot out.png   # 顺便�
 茶/米/布幌子、石桥），主界面用 `main_bg.png`（**像素插画风**：灯笼、牌坊、书案笔筒）——
 **两张不是同一画风**。两者都能各自用，但放在一起会看出跳。见 `ART_PLAN.md` 资产清单第 1、2 项。
 
-### ⑩⑪ 的现状（未做，需要人生成素材）
+### ⑩⑪ 的现状（**已补素材并接入，2026-10-13**；待目视定稿）
 
-两项都是**缺贴图**，性质和 ⑥⑫ 一样：**本机没有图像生成工具，只能由人用豆包生成**。
-提示词已在位（`data/art_prompts_round2.json`），可直接取用：
+两项都是**缺贴图**。**本机已建成可用的出图工具链**（绘世启动器 + SD1.5/SDXL 底模 + 风格 LoRA，
+配方见 `ART_METHOD_FINDINGS.md` 与 `ART_ENDING_SET.md`），因此这三张由 AI 生成后接入：
 
-- **结局背景**（`success.tscn` / `gameover.tscn`）—— 需要两张（成功 / 失败各一）。
-- **序章背景**（`prologue.tscn`）—— `ART_PLAN.md` 标为"可选"。
+| 场景 | 接入贴图 | 文字区细节 / 暗像素 | 说明 |
+|---|---|---|---|
+| `success.tscn` | `assets/images/backgrounds/ending_success.png` | 1.18 / 0.031 | 夕阳宫门剪影（暖）|
+| `gameover.tscn` | `assets/images/backgrounds/ending_gameover.png` | 6.72 / 0.762 | 黄昏雨中空街（冷）；建筑偏欧式，待改 |
+| `prologue.tscn` | `assets/images/backgrounds/prologue_bg.png` | **0.70 / 0.004** | 书生书房暖光（文字最清楚）|
 
-**结局的优先级高于序章**：结局是玩家情绪的最高点，现在却是纯文字空面板；序章只是开场过场。
-两者的接入方式与 ⑬ 不同 —— **它们需要的是新贴图**（不像 ⑬ 能用手上已有的字体渲染出来）。
+- 接入方式与 ⑬ 一致：`Background`（`TextureRect`，`expand_mode=1` + `stretch_mode=5`）作为**第一个子节点**，
+  因此位于覆盖层之下；`load_steps` 相应 2 → 3。
+- `prologue.tscn` 同时**移除了空的 `Panel` 节点**（它在背景上画出一圈细边框、与背景不搭；
+  `prologue.gd` 只引用 `$VBoxContainer/ConfirmButton`，不依赖 Panel）。
+- **已截图验证**：三个界面均出图且为 **1152×648**，游戏内截图见 `docs/screenshots/ingame/`。
+- ⚠️ **仍待人眼定稿**：判据只能筛掉明显不合格，不能替代审美判断（详见 `ART_METHOD_FINDINGS.md` §三）。
+- ⚠️ 同批生成的 `main.png`（标题）**仍是水墨风**、与主界面不成套 —— 该项未动，见 `ART_PLAN.md` §二·五。
 
 ---
 
