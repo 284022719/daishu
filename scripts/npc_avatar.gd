@@ -27,6 +27,8 @@ extends Control
 ##   hbox.add_child(av)
 
 const FONT_PATH := "res://assets/fonts/hanchanlongcang.otf"
+## 肖像目录：按 `<关系>.png` 放这里即自动生效（缺失则回落程序化名帖牌）
+const AVATAR_DIR := "res://assets/images/ui/avatars/"
 const SIZE := 44.0
 const FONT_SIZE := 26
 
@@ -57,6 +59,8 @@ var _glyph: String = "客"
 var _color: Color = FALLBACK_COLOR
 var _font: Font = null
 var _relation: String = ""
+var _texture: Texture2D = null      ## 关系对应的肖像贴图；为 null 时回落到程序化名帖牌
+var _texture_path: String = ""      ## 由 setup(npc) 的 avatar 字段指定（可空）
 
 
 func _ready() -> void:
@@ -69,7 +73,15 @@ func _ready() -> void:
 
 
 ## 从 NPC 字典配置头像。缺 `relation` 字段时回退为默认字与色（不报错、不崩）。
+## `avatar` 字段可给肖像路径；给了就加载，加载不到则静默回落到程序化名帖牌。
 func setup(npc: Dictionary) -> void:
+	var av := str(npc.get("avatar", ""))
+	if av != "" and ResourceLoader.exists(av):
+		_texture = load(av) as Texture2D
+		_texture_path = av
+	else:
+		_texture = null
+		_texture_path = ""
 	set_relation(str(npc.get("relation", "")))
 
 
@@ -80,6 +92,11 @@ func set_relation(relation: String) -> void:
 	else:
 		_glyph = "客"
 	_color = RELATION_COLOR.get(relation, FALLBACK_COLOR)
+	# 未显式给 avatar 时，按关系找默认肖像：assets/images/ui/avatars/<关系>.png
+	if _texture == null and relation != "":
+		var p := "%s%s.png" % [AVATAR_DIR, relation]
+		if ResourceLoader.exists(p):
+			_texture = load(p) as Texture2D
 	queue_redraw()
 
 
@@ -100,7 +117,24 @@ func _draw() -> void:
 	var c := Vector2(SIZE, SIZE) * 0.5
 	var r := SIZE * 0.5 - 1.0
 
-	# 亮外圈 → 主色圆 → 暗内环（三层，做出"名帖牌"的厚度感）
+	# 有真肖像时：画贴图 + 右下角一个小的关系色角标（保辨识度）
+	if _texture != null:
+		draw_texture_rect(_texture, Rect2(Vector2.ZERO, Vector2(SIZE, SIZE)), false)
+		# 角标：主色圆 + 关系字，直径约 SIZE*0.42
+		var br := SIZE * 0.21
+		var bc := Vector2(SIZE - br - 0.5, SIZE - br - 0.5)
+		draw_circle(bc, br, RING_OUTER, true, -1.0, true)
+		draw_circle(bc, br - 1.0, _color, true, -1.0, true)
+		if _font != null:
+			var fs := int(FONT_SIZE * 0.52)
+			var ts2 := _font.get_string_size(_glyph, HORIZONTAL_ALIGNMENT_LEFT, -1, fs)
+			var asc2 := _font.get_ascent(fs)
+			var desc2 := _font.get_descent(fs)
+			draw_string(_font, Vector2(bc.x - ts2.x * 0.5, bc.y + (asc2 - desc2) * 0.5),
+				_glyph, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, INK)
+		return
+
+	# 无真肖像时：走原来的"名帖牌"（亮外圈 → 主色圆 → 暗内环）
 	draw_circle(c, r, RING_OUTER, true, -1.0, true)
 	draw_circle(c, r - 1.5, _color, true, -1.0, true)
 	draw_circle(c, r - 1.5, RING_INNER, false, 1.5, true)
