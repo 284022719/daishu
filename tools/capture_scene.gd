@@ -16,6 +16,7 @@ func _initialize() -> void:
 	var scene_key := "main"
 	var out_path := ""
 	var click_name := ""
+	var click_first := ""       ## 可选：点击该节点路径下的**第一个 Button**（用于名字由代码生成的列表项）
 	var args := OS.get_cmdline_user_args()
 	for i in range(args.size()):
 		match args[i]:
@@ -28,6 +29,9 @@ func _initialize() -> void:
 			"--click":
 				if i + 1 < args.size():
 					click_name = args[i + 1]
+			"--click-first":
+				if i + 1 < args.size():
+					click_first = args[i + 1]
 
 	if out_path.is_empty():
 		push_error("缺少 --out 参数")
@@ -88,6 +92,22 @@ func _initialize() -> void:
 		else:
 			print("[capture] ", click_name, " 不是 Button")
 
+	# 可选：点击某个节点路径下的**第一个 Button**
+	# （用于名字由代码生成的列表项，比如委托列表 —— 它们的 name 不是固定字符串）
+	if not click_first.is_empty():
+		var host := scene.get_node_or_null(click_first)
+		if host == null:
+			print("[capture] 找不到节点: ", click_first)
+		else:
+			var first_btn := _find_first_button(host)
+			if first_btn == null:
+				print("[capture] ", click_first, " 下没有 Button")
+			else:
+				print("[capture] 点击 ", click_first, " 下第一个按钮: ", first_btn.text)
+				first_btn.emit_signal("pressed")
+				for i in range(10):
+					await process_frame
+
 	for i in range(3):
 		await process_frame
 
@@ -111,6 +131,16 @@ func _find_node_by_name(root: Node, target: String) -> Node:
 		return root
 	for child in root.get_children():
 		var found := _find_node_by_name(child, target)
+		if found != null:
+			return found
+	return null
+
+## 深度优先找第一个 Button（用于 name 由代码生成的列表项）
+func _find_first_button(root: Node) -> Button:
+	if root is Button:
+		return root as Button
+	for child in root.get_children():
+		var found := _find_first_button(child)
 		if found != null:
 			return found
 	return null
