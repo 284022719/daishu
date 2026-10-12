@@ -234,6 +234,11 @@ godot --path . --script res://tools/verify_drop.gd -- --shot out.png   # 顺便�
 ⚠️ 已知不足：新图是"湖畔村落+远山"的东方式风景，**题材不等于严格明代市井**（画风与色调成套）。
 找出路的完整实验记录见 `ART_TITLE_SET_ATTEMPT.md`（失败那轮）与 `ART_TITLE_SET_DONE.md`（成功那轮）。
 
+✅ **同一轮还修掉了 `gameover` 的欧式建筑（2026-10-13）**：旧 `ending_gameover.png` 由 `Illustrious-XL`
+生成，是**欧式尖顶木架房**（同一底模先验问题）。改用 `waiIllustriousSDXL_v170` + 中式构件提示词
++ 欧式负面词重出后：**中央带细节 6.72→4.17、暗像素 0.558→0.461**，冷调保持（暖度 −27），
+文字底板下更易读。旧图归档到临时区。详见 `ART_GAMEOVER_CN.md`。
+
 ### ⑩⑪ 的现状（**已补素材并接入，2026-10-13**；待目视定稿）
 
 两项都是**缺贴图**。**本机已建成可用的出图工具链**（绘世启动器 + SD1.5/SDXL 底模 + 风格 LoRA，
